@@ -18,7 +18,6 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-    
     <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
@@ -325,8 +324,12 @@
                     });
                 });
 
-                // Sort descending locally by timestamp (latest order at the top)
-                tempOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                // Defensive Sorting (Handles missing or corrupt createdAt values safely)
+                tempOrders.sort((a, b) => {
+                    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                    return dateB - dateA;
+                });
                 
                 globalOrders = tempOrders;
                 console.log("Realtime Sync Completed with orders: ", globalOrders);
@@ -405,28 +408,32 @@
 
             // 1. Calculations in memory (Today's boundaries locally)
             const todayOrders = globalOrders.filter(order => {
-                return new Date(order.createdAt).toDateString() === todayStr;
+                return order.createdAt ? new Date(order.createdAt).toDateString() === todayStr : false;
             });
 
-            // Hitung metrik hari ini secara berasingan
+            // Hitung metrik hari ini secara berasingan dengan kawalan jenis data yang ketat (Defensive Type Casting)
             let totalPaidToday = 0;
             let totalUnpaidToday = 0;
             let paidCustomerCount = 0;
 
             todayOrders.forEach(order => {
-                if (order.paymentStatus === 'Paid') {
-                    totalPaidToday += order.totalPrice || 0;
+                const paymentStatus = order.paymentStatus || 'Unpaid';
+                const totalPrice = Number(order.totalPrice) || 0;
+                if (paymentStatus === 'Paid') {
+                    totalPaidToday += totalPrice;
                     paidCustomerCount++; // 1 Paid Order = 1 Pelanggan Berjaya Bayar
                 } else {
-                    totalUnpaidToday += order.totalPrice || 0;
+                    totalUnpaidToday += totalPrice;
                 }
             });
 
             // Masukkan baki bil tak berbayar yang terkumpul (dari mana-mana tarikh sekalipun) ke pending payment
             let overallUnpaidSum = 0;
             globalOrders.forEach(order => {
-                if (order.paymentStatus !== 'Paid') {
-                    overallUnpaidSum += order.totalPrice || 0;
+                const paymentStatus = order.paymentStatus || 'Unpaid';
+                const totalPrice = Number(order.totalPrice) || 0;
+                if (paymentStatus !== 'Paid') {
+                    overallUnpaidSum += totalPrice;
                 }
             });
 
@@ -435,19 +442,20 @@
             textPendingPayments.innerText = `RM ${overallUnpaidSum.toFixed(2)}`;
 
             // 2. Tapis senarai untuk monitor pesanan aktif:
-            // - Kita tunjukkan SEMUA order yang statusnya belum dibayar (Unpaid) (walau apa pun tarikhnya supaya tak tercicir)
+            // - Kita tunjukkan SEMUA order yang statusnya belum dibayar (Unpaid/undefined) (walau apa pun tarikhnya supaya tak tercicir)
             // - Serta semua order yang sudah berbayar (Paid) khusus untuk tarikh hari ini.
             let activeDisplayList = globalOrders.filter(order => {
-                const isPaid = order.paymentStatus === 'Paid';
-                const isToday = new Date(order.createdAt).toDateString() === todayStr;
+                const paymentStatus = order.paymentStatus || 'Unpaid';
+                const isPaid = paymentStatus === 'Paid';
+                const isToday = order.createdAt ? new Date(order.createdAt).toDateString() === todayStr : false;
                 return !isPaid || isToday;
             });
 
             // Tapis lagi mengikut sub-filter pilihan pengguna (Belum Bayar / Sudah Bayar / Semua)
             if (filterType === 'unpaid') {
-                activeDisplayList = activeDisplayList.filter(o => o.paymentStatus !== 'Paid');
+                activeDisplayList = activeDisplayList.filter(o => (o.paymentStatus || 'Unpaid') !== 'Paid');
             } else if (filterType === 'paid') {
-                activeDisplayList = activeDisplayList.filter(o => o.paymentStatus === 'Paid');
+                activeDisplayList = activeDisplayList.filter(o => (o.paymentStatus || 'Unpaid') === 'Paid');
             }
 
             if (activeDisplayList.length === 0) {
@@ -462,44 +470,59 @@
             // Populate active layout cards
             liveOrdersGrid.innerHTML = '';
             activeDisplayList.forEach(order => {
-                const isPaid = order.paymentStatus === 'Paid';
+                const paymentStatus = order.paymentStatus || 'Unpaid';
+                const isPaid = paymentStatus === 'Paid';
                 
                 // Format Tarikh & Masa dengan mesra zon masa tempatan
-                const orderDateObj = new Date(order.createdAt);
-                const isTodayStr = orderDateObj.toDateString() === todayStr;
+                const orderDateObj = order.createdAt ? new Date(order.createdAt) : new Date();
+                const isTodayStr = order.createdAt ? orderDateObj.toDateString() === todayStr : true;
                 
-                const displayDate = isTodayStr 
-                    ? "Hari Ini" 
-                    : orderDateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+                const displayDate = order.createdAt 
+                    ? (isTodayStr ? "Hari Ini" : orderDateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' }))
+                    : "Baru";
                 
-                const createdTime = orderDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+                const createdTime = order.createdAt 
+                    ? orderDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) 
+                    : "";
 
                 const card = document.createElement('div');
                 card.className = `p-5 rounded-2xl border transition-all ${isPaid ? 'bg-slate-50 border-gray-200 opacity-80' : 'bg-white border-amber-200 shadow-md'}`;
                 
-                // Construct inner list of items ordered
+                // Construct inner list of items ordered safely (Defensively checks for Array structure)
                 let itemsListHtml = '';
-                order.items.forEach(it => {
+                const items = Array.isArray(order.items) ? order.items : [];
+                items.forEach(it => {
+                    const itemName = it.name || 'Sajian Rahsia';
+                    const itemPrice = Number(it.price) || 0;
+                    const itemQty = Number(it.quantity) || 1;
                     itemsListHtml += `
                         <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 last:border-0">
-                            <span class="text-gray-800"><span class="font-bold text-navy">${it.quantity}x</span> ${it.name}</span>
-                            <span class="font-semibold text-gray-500">RM ${(it.price * it.quantity).toFixed(2)}</span>
+                            <span class="text-gray-800"><span class="font-bold text-navy">${itemQty}x</span> ${itemName}</span>
+                            <span class="font-semibold text-gray-500">RM ${(itemPrice * itemQty).toFixed(2)}</span>
                         </div>
                     `;
                 });
+
+                if (items.length === 0) {
+                    itemsListHtml = `<div class="text-xs text-gray-400 italic py-1">Tiada butiran item direkodkan</div>`;
+                }
+
+                const tableNum = order.tableNumber || '?';
+                const receiptId = order.receiptId || order.id || 'WI-UNKNOWN';
+                const orderTotal = Number(order.totalPrice) || 0;
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
                         <div>
                             <span class="text-xs bg-[#111e29]/10 text-navy font-bold px-2.5 py-0.5 rounded-full border border-navy/10">
-                                MEJA ${order.tableNumber}
+                                MEJA ${tableNum}
                             </span>
-                            <p class="text-[10px] font-mono font-bold text-gray-400 mt-1">${order.receiptId}</p>
+                            <p class="text-[10px] font-mono font-bold text-gray-400 mt-1">${receiptId}</p>
                         </div>
                         <div class="text-right">
-                            <span class="text-xs text-navy font-bold block">${displayDate} &bull; ${createdTime}</span>
+                            <span class="text-xs text-navy font-bold block">${displayDate} ${createdTime ? `&bull; ${createdTime}` : ''}</span>
                             <span class="inline-block mt-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
-                                ${isPaid ? 'Paid' : 'Unpaid'}
+                                ${paymentStatus}
                             </span>
                         </div>
                     </div>
@@ -511,17 +534,17 @@
 
                     <div class="flex justify-between items-center mb-4">
                         <span class="text-xs font-semibold text-gray-500">Jumlah Bil:</span>
-                        <span class="text-lg font-serif-elegant font-bold text-navy">RM ${(order.totalPrice || 0).toFixed(2)}</span>
+                        <span class="text-lg font-serif-elegant font-bold text-navy">RM ${orderTotal.toFixed(2)}</span>
                     </div>
 
                     <!-- Toggle Cashier Payment Action Button -->
                     <div class="pt-3 border-t border-gray-100 flex gap-2">
                         ${isPaid ? `
-                            <button onclick="togglePaymentStatus('${order.receiptId}', 'Unpaid')" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                            <button onclick="togglePaymentStatus('${receiptId}', 'Unpaid')" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-undo"></i> Tanda Belum Bayar
                             </button>
                         ` : `
-                            <button onclick="togglePaymentStatus('${order.receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                            <button onclick="togglePaymentStatus('${receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm">
                                 <i class="fa-solid fa-check"></i> Sudah Bayar (PAID)
                             </button>
                         `}
@@ -549,7 +572,7 @@
                 }
             } else {
                 // Offline fallback modifications
-                const found = globalOrders.find(o => o.receiptId === receiptId);
+                const found = globalOrders.find(o => (o.receiptId || o.id) === receiptId);
                 if (found) {
                     found.paymentStatus = newStatus;
                     renderDashboard();
@@ -568,7 +591,7 @@
             const groupedByDate = {};
 
             globalOrders.forEach(order => {
-                const dateObj = new Date(order.createdAt);
+                const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
                 const localDateStr = dateObj.toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' }); // E.g., "17 Jun 2026"
                 
                 if (!groupedByDate[localDateStr]) {
@@ -582,14 +605,18 @@
                     };
                 }
 
-                if (order.paymentStatus === 'Paid') {
-                    groupedByDate[localDateStr].totalPaid += order.totalPrice || 0;
+                const paymentStatus = order.paymentStatus || 'Unpaid';
+                const orderTotal = Number(order.totalPrice) || 0;
+                const receiptId = order.receiptId || order.id || 'WI-UNKNOWN';
+
+                if (paymentStatus === 'Paid') {
+                    groupedByDate[localDateStr].totalPaid += orderTotal;
                     groupedByDate[localDateStr].paidCount++;
                 } else {
-                    groupedByDate[localDateStr].totalUnpaid += order.totalPrice || 0;
+                    groupedByDate[localDateStr].totalUnpaid += orderTotal;
                     groupedByDate[localDateStr].uncollectedCount++;
                 }
-                groupedByDate[localDateStr].orderIds.push(order.receiptId);
+                groupedByDate[localDateStr].orderIds.push(receiptId);
             });
 
             // Convert to array and sort chronological reverse
