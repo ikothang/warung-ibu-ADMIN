@@ -1,0 +1,647 @@
+<!DOCTYPE html>
+<html lang="ms">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Warung Ibu Admin</title>
+    <!-- Tailwind CSS for modern dashboard design -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for premium branding -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <!-- Firebase SDKs (Compat versions for global usage in vanilla html) -->
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
+
+    <style>
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #f6f8fa;
+            color: #2c2520;
+        }
+        
+        .font-serif-elegant {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .font-classic {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Traditional Batik Accents for luxury brand feel */
+        .batik-bg {
+            background-color: #111e29;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 0l40 40-40 40L0 40z' fill='%23c5a850' fill-opacity='0.08'/%3E%3Cpath d='M40 10l30 30-30 30-30-30z' fill='%231a2e40' fill-opacity='0.2'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23c5a850' fill-opacity='0.3'/%3E%3C/svg%3E");
+        }
+
+        .text-gold {
+            color: #bfa34a;
+        }
+        
+        .bg-gold {
+            background-color: #bfa34a;
+        }
+        
+        .bg-navy {
+            background-color: #111e29;
+        }
+
+        /* Custom Scrollbar */
+        ::-webkit-scrollbar {
+            width: 6px;
+            height: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c5a850;
+            border-radius: 10px;
+        }
+    </style>
+</head>
+<body class="min-h-screen flex flex-col justify-between overflow-x-hidden">
+
+    <!-- OVERLAY LOADING SPINNER -->
+    <div id="loadingOverlay" class="fixed inset-0 bg-[#111e29] z-50 flex flex-col items-center justify-center transition-opacity duration-300">
+        <div class="relative w-24 h-24 mb-4">
+            <div class="absolute inset-0 border-4 border-dashed border-[#c5a850] rounded-full animate-spin"></div>
+            <div class="absolute inset-2 border-2 border-double border-white rounded-full flex items-center justify-center">
+                <span class="text-[#c5a850] font-classic font-bold text-lg">WI</span>
+            </div>
+        </div>
+        <p class="text-white font-serif-elegant tracking-widest text-lg">Menyambung Ke Dapur Utama...</p>
+        <p class="text-xs text-gray-400 mt-2">Sistem Pengurusan Jualan & Pesanan Digital</p>
+    </div>
+
+    <!-- MAIN DASHBOARD WRAPPER -->
+    <div class="flex-grow flex flex-col">
+        <!-- Dashboard Header -->
+        <header class="bg-navy text-white shadow-xl sticky top-0 z-30">
+            <div class="h-1 bg-[#c5a850]"></div>
+            <div class="max-w-7xl mx-auto px-4 py-4 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="p-2 bg-[#c5a850]/15 text-[#c5a850] rounded-xl border border-[#c5a850]/30">
+                        <i class="fa-solid fa-desktop text-xl"></i>
+                    </span>
+                    <div>
+                        <h2 class="text-lg font-classic font-bold tracking-wide">WARUNG IBU ADMIN</h2>
+                        <p class="text-[10px] text-gray-300">Warung Ibu &bull; Urus Jualan, Jejaki Pesanan & Analisis Tunai</p>
+                    </div>
+                </div>
+                
+                <!-- Internal Navigation Tabs -->
+                <div class="flex bg-slate-800/80 p-1 rounded-xl border border-slate-700">
+                    <button onclick="switchTab('orders')" id="tabOrders" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-white bg-[#c5a850]">
+                        <i class="fa-solid fa-receipt mr-1"></i> Pesanan Aktif
+                    </button>
+                    <button onclick="switchTab('history')" id="tabHistory" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-history mr-1"></i> Sejarah & Pertumbuhan
+                    </button>
+                </div>
+            </div>
+        </header>
+
+        <!-- TODAY'S GENERAL ANALYTICS -->
+        <section class="max-w-7xl mx-auto w-full px-4 pt-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+                <!-- Card 1: Sales Revenue Today -->
+                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Jumlah Jualan Hari Ini</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-emerald-800" id="todaySales">RM 0.00</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Hanya daripada pesanan berstatus <span class="font-bold text-emerald-600">PAID</span></p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100">
+                        <i class="fa-solid fa-coins text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Card 2: Total Customers Today -->
+                <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-blue-800" id="todayCustomers">0 Orang</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Berdasarkan jumlah resit pesanan unik</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Card 3: Pending Payments -->
+                <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Menunggu Bayaran (Unpaid)</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-amber-800" id="pendingPayments">RM 0.00</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Dari pelanggan yang sedang menjamu selera</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100">
+                        <i class="fa-solid fa-cash-register text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB CONTENT: LIVE ORDER MONITOR -->
+        <section id="tabOrdersContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif Hari Ini</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Pantau resit pesanan, kemas kini bayaran bilik meja dengan serta-merta.</p>
+                </div>
+
+                <!-- Live filter badges -->
+                <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg border border-gray-200">
+                    <button onclick="setFilter('all')" id="filterAll" class="px-3 py-1 text-xs font-bold rounded-md bg-white text-navy shadow-sm">Semua</button>
+                    <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-3 py-1 text-xs font-bold rounded-md text-gray-600 hover:text-navy">Belum Bayar</button>
+                    <button onclick="setFilter('paid')" id="filterPaid" class="px-3 py-1 text-xs font-bold rounded-md text-gray-600 hover:text-navy">Sudah Bayar</button>
+                </div>
+            </div>
+
+            <!-- Grid orders monitor -->
+            <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Loaded Dynamically via JS and Firestore Live listeners -->
+            </div>
+
+            <!-- Empty State -->
+            <div id="noLiveOrders" class="hidden text-center py-20 bg-white rounded-2xl border border-gray-100 shadow-sm">
+                <div class="text-gray-300 text-5xl mb-4"><i class="fa-solid fa-clipboard-check"></i></div>
+                <h4 class="font-bold text-gray-700">Tiada Pesanan Direkodkan</h4>
+                <p class="text-xs text-gray-400 mt-1">Belum ada pesanan aktif yang menepati saringan tapisan ini.</p>
+            </div>
+        </section>
+
+        <!-- TAB CONTENT: HISTORY & BUSINESS GROWTH -->
+        <section id="tabHistoryContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
+            <div class="mb-6">
+                <h3 class="text-xl font-serif-elegant font-bold text-navy">Sejarah Pendapatan & Pertumbuhan</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Analisis pendapatan perniagaan harian bagi merekodkan prestasi jualan keseluruhan.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden mb-6">
+                <div class="p-4 bg-navy text-white flex justify-between items-center">
+                    <span class="text-xs font-classic tracking-wider uppercase font-bold">Ringkasan Prestasi Harian</span>
+                    <span class="text-[10px] text-gray-400">Tersusun mengikut Tarikh Terbaru</span>
+                </div>
+                
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-slate-50 border-b border-gray-200 text-[10px] font-bold text-gray-500 uppercase tracking-wider">
+                                <th class="p-4">Tarikh</th>
+                                <th class="p-4">Bilangan Pelanggan (Resit Unik)</th>
+                                <th class="p-4">Kutipan Jualan Berjaya (Paid)</th>
+                                <th class="p-4">Belum Dikutip (Unpaid)</th>
+                                <th class="p-4">Tindakan</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody" class="text-xs text-gray-700 divide-y divide-gray-100">
+                            <!-- Populated in memory dynamically by grouping timestamps -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="noHistoryData" class="hidden text-center py-16">
+                    <div class="text-gray-300 text-4xl mb-3"><i class="fa-solid fa-chart-line"></i></div>
+                    <p class="text-xs text-gray-400 font-bold">Tiada Rekod Sejarah Dijumpai</p>
+                </div>
+            </div>
+        </section>
+    </div>
+
+    <!-- FOOTER -->
+    <footer class="bg-navy text-gray-400 text-center py-4 border-t border-[#c5a850]/20 text-[11px] tracking-wide relative">
+        <div class="absolute inset-0 opacity-5 batik-bg pointer-events-none"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>&copy; 2026 Warung Ibu Admin. Portal Sistem Pentadbiran Warung Ibu Bersepadu.</p>
+            <p class="text-xs text-gray-400">Sambungan Automatik Terus ke Cloud Firebase</p>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT CONTROLLERS -->
+    <script>
+        // ------------------------------------------------------------
+        // 1. CONFIGURATION & STATE
+        // ------------------------------------------------------------
+        const firebaseConfig = {
+            apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
+            authDomain: "restoran-dd4bd.firebaseapp.com",
+            databaseURL: "https://restoran-dd4bd-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "restoran-dd4bd",
+            storageBucket: "restoran-dd4bd.firebasestorage.app",
+            messagingSenderId: "44849081363",
+            appId: "1:44849081363:web:1a56f2ebc972f5227be3e6",
+            measurementId: "G-GME7877LYX"
+        };
+
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'restoran-dd4bd';
+        
+        let db;
+        let auth;
+        let globalOrders = []; // Keeps all read orders synchronized in local memory
+        let filterType = 'all'; // 'all', 'unpaid', 'paid'
+        let currentTab = 'orders'; // 'orders', 'history'
+
+        // ------------------------------------------------------------
+        // 2. FIREBASE INITIALIZATION & SIGN-IN
+        // ------------------------------------------------------------
+        window.addEventListener('DOMContentLoaded', async () => {
+            try {
+                // Read from environment if config is injected dynamically, otherwise fallback strictly to project config
+                const activeConfig = typeof __firebase_config !== 'undefined' ? JSON.parse(__firebase_config) : firebaseConfig;
+                
+                const app = firebase.initializeApp(activeConfig);
+                auth = firebase.auth(app);
+                db = firebase.firestore(app);
+
+                // Authenticate before any DB Query (MANDATORY RULE 3)
+                if (typeof __initial_auth_token !== 'undefined' && __initial_auth_token) {
+                    await firebase.auth().signInWithCustomToken(__initial_auth_token);
+                } else {
+                    await firebase.auth().signInAnonymously();
+                }
+                console.log("Firebase connected successfully on Admin page.");
+                
+                // Fire live stream listener
+                listenToOrders();
+
+            } catch (err) {
+                console.error("Firebase connection error in Admin panel: ", err);
+            } finally {
+                // Clear loading screen
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.add('opacity-0');
+                    setTimeout(() => {
+                        document.getElementById('loadingOverlay').classList.add('hidden');
+                    }, 300);
+                }, 800);
+            }
+        });
+
+        // ------------------------------------------------------------
+        // 3. FIRESTORE REAL-TIME LISTENER (RULE 2 COMPLIANT - LOCAL SORT)
+        // ------------------------------------------------------------
+        function listenToOrders() {
+            if (!db) {
+                console.warn("Firestore not ready. Running in Offline Simulator mode.");
+                simulateOfflineData();
+                return;
+            }
+
+            // RULE 1: STRICT PATHWAY REQUIRED -> /artifacts/{appId}/public/data/{collectionName}
+            const collectionRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders');
+
+            // Set real-time listener (MANDATORY RULE 2: No compounds or limit, fetch all and filter in memory)
+            collectionRef.onSnapshot((querySnapshot) => {
+                let tempOrders = [];
+                querySnapshot.forEach((doc) => {
+                    tempOrders.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
+                });
+
+                // Sort descending locally by timestamp (latest order at the top)
+                tempOrders.sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+                
+                globalOrders = tempOrders;
+                console.log("Realtime Sync Completed with orders: ", globalOrders);
+
+                // Trigger fresh render on the active dashboard screen
+                renderDashboard();
+            }, (error) => {
+                console.error("Failed to connect live snapshot reader: ", error);
+            });
+        }
+
+        // ------------------------------------------------------------
+        // 4. TAB CONTROLLER SWITCH
+        // ------------------------------------------------------------
+        function switchTab(tab) {
+            currentTab = tab;
+            const tabOrders = document.getElementById('tabOrders');
+            const tabHistory = document.getElementById('tabHistory');
+            const contentOrders = document.getElementById('tabOrdersContent');
+            const contentHistory = document.getElementById('tabHistoryContent');
+
+            if (tab === 'orders') {
+                contentOrders.classList.remove('hidden');
+                contentHistory.classList.add('hidden');
+
+                tabOrders.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-white bg-[#c5a850]";
+                tabHistory.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
+            } else {
+                contentOrders.classList.add('hidden');
+                contentHistory.classList.remove('hidden');
+
+                tabHistory.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-white bg-[#c5a850]";
+                tabOrders.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
+            }
+            renderDashboard();
+        }
+
+        // Filter status configuration
+        function setFilter(type) {
+            filterType = type;
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.className = "px-3 py-1 text-xs font-bold rounded-md text-gray-600 hover:text-navy";
+            });
+
+            // Standard BM name matching for button activation
+            let btnId = "filterAll";
+            if (type === 'unpaid') btnId = "filterUnpaid";
+            if (type === 'paid') btnId = "filterPaid";
+
+            const activeBtn = document.getElementById(btnId);
+            if (activeBtn) {
+                activeBtn.className = "px-3 py-1 text-xs font-bold rounded-md bg-white text-navy shadow-sm";
+            }
+            renderDashboard();
+        }
+
+        // ------------------------------------------------------------
+        // 5. RENDERING CORE METRICS & TODAY'S ACTIVE LIST
+        // ------------------------------------------------------------
+        function renderDashboard() {
+            if (currentTab === 'history') {
+                renderHistoryTab();
+                return;
+            }
+
+            const liveOrdersGrid = document.getElementById('liveOrdersContainer');
+            const noOrdersNotice = document.getElementById('noLiveOrders');
+            
+            // Basic Metrics Elements
+            const textTodaySales = document.getElementById('todaySales');
+            const textTodayCustomers = document.getElementById('todayCustomers');
+            const textPendingPayments = document.getElementById('pendingPayments');
+
+            // 1. Calculations in memory (Today's boundaries locally)
+            const todayStr = new Date().toDateString(); // "Wed Jun 17 2026"
+
+            const todayOrders = globalOrders.filter(order => {
+                return new Date(order.createdAt).toDateString() === todayStr;
+            });
+
+            // Calculate metrics
+            let totalPaidToday = 0;
+            let totalUnpaidToday = 0;
+            let paidCustomerCount = 0;
+
+            todayOrders.forEach(order => {
+                if (order.paymentStatus === 'Paid') {
+                    totalPaidToday += order.totalPrice || 0;
+                    paidCustomerCount++; // 1 Paid Order = 1 Paid Customer
+                } else {
+                    totalUnpaidToday += order.totalPrice || 0;
+                }
+            });
+
+            textTodaySales.innerText = `RM ${totalPaidToday.toFixed(2)}`;
+            textTodayCustomers.innerText = `${paidCustomerCount} Orang`;
+            textPendingPayments.innerText = `RM ${totalUnpaidToday.toFixed(2)}`;
+
+            // 2. Filter list based on sub-filter selected ('all', 'unpaid', 'paid')
+            let displayOrders = todayOrders;
+            if (filterType === 'unpaid') {
+                displayOrders = todayOrders.filter(o => o.paymentStatus !== 'Paid');
+            } else if (filterType === 'paid') {
+                displayOrders = todayOrders.filter(o => o.paymentStatus === 'Paid');
+            }
+
+            if (displayOrders.length === 0) {
+                noOrdersNotice.classList.remove('hidden');
+                liveOrdersGrid.classList.add('hidden');
+                return;
+            } else {
+                noOrdersNotice.classList.add('hidden');
+                liveOrdersGrid.classList.remove('hidden');
+            }
+
+            // Populate active layout cards
+            liveOrdersGrid.innerHTML = '';
+            displayOrders.forEach(order => {
+                const isPaid = order.paymentStatus === 'Paid';
+                const createdTime = new Date(order.createdAt).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                const card = document.createElement('div');
+                card.className = `p-5 rounded-2xl border transition-all ${isPaid ? 'bg-slate-50 border-gray-200 opacity-80' : 'bg-white border-amber-200 shadow-sm'}`;
+                
+                // Construct inner list of items ordered
+                let itemsListHtml = '';
+                order.items.forEach(it => {
+                    itemsListHtml += `
+                        <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 last:border-0">
+                            <span class="text-gray-800"><span class="font-bold text-navy">${it.quantity}x</span> ${it.name}</span>
+                            <span class="font-semibold text-gray-500">RM ${(it.price * it.quantity).toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs bg-[#111e29]/10 text-navy font-bold px-2.5 py-0.5 rounded-full border border-navy/10">
+                                MEJA ${order.tableNumber}
+                            </span>
+                            <p class="text-[10px] font-mono font-bold text-gray-400 mt-1">${order.receiptId}</p>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-xs text-gray-400 block">${createdTime}</span>
+                            <span class="inline-block mt-1 text-[10px] font-bold uppercase px-2 py-0.5 rounded ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
+                                ${isPaid ? 'Paid' : 'Unpaid'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1 mb-4 bg-gray-50/50 p-3 rounded-xl border border-gray-100">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-wider mb-1.5">Sajian Dipesan:</p>
+                        ${itemsListHtml}
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4">
+                        <span class="text-xs font-semibold text-gray-500">Jumlah Bil:</span>
+                        <span class="text-lg font-serif-elegant font-bold text-navy">RM ${(order.totalPrice || 0).toFixed(2)}</span>
+                    </div>
+
+                    <!-- Toggle Cashier Payment Action Button -->
+                    <div class="pt-3 border-t border-gray-100 flex gap-2">
+                        ${isPaid ? `
+                            <button onclick="togglePaymentStatus('${order.receiptId}', 'Unpaid')" class="w-full py-2 bg-slate-200 hover:bg-slate-300 text-slate-800 text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-undo"></i> Tanda Belum Bayar
+                            </button>
+                        ` : `
+                            <button onclick="togglePaymentStatus('${order.receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white text-[10px] font-bold uppercase tracking-wider rounded-lg transition-colors flex items-center justify-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-check"></i> Sudah Bayar (PAID)
+                            </button>
+                        `}
+                    </div>
+                `;
+                liveOrdersGrid.appendChild(card);
+            });
+        }
+
+        // ------------------------------------------------------------
+        // 6. TOGGLE PAYMENT STATUS (UPDATES FIRESTORE)
+        // ------------------------------------------------------------
+        async function togglePaymentStatus(receiptId, newStatus) {
+            if (db) {
+                try {
+                    // RULE 1: STRICT PATHWAY REQUIRED -> /artifacts/{appId}/public/data/{collectionName}
+                    const docRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId);
+                    await docRef.update({
+                        paymentStatus: newStatus
+                    });
+                    console.log(`Order status updated successfully to: ${newStatus}`);
+                } catch (error) {
+                    console.error("Failed to update status on Firebase: ", error);
+                    alertCustom("Gagal mengemaskini status bayaran. Sila cuba sekali lagi.");
+                }
+            } else {
+                // Offline fallback modifications
+                const found = globalOrders.find(o => o.receiptId === receiptId);
+                if (found) {
+                    found.paymentStatus = newStatus;
+                    renderDashboard();
+                }
+            }
+        }
+
+        // ------------------------------------------------------------
+        // 7. OWNER REPORTING - HISTORY LOGS & DAILY AGGREGATIONS
+        // ------------------------------------------------------------
+        function renderHistoryTab() {
+            const tableBody = document.getElementById('historyTableBody');
+            const noData = document.getElementById('noHistoryData');
+
+            // 1. Group ALL orders by calendar Date dynamically in memory
+            const groupedByDate = {};
+
+            globalOrders.forEach(order => {
+                const dateObj = new Date(order.createdAt);
+                const localDateStr = dateObj.toLocaleDateString('ms-MY', { year: 'numeric', month: 'long', day: 'numeric' }); // E.g., "17 Jun 2026"
+                
+                if (!groupedByDate[localDateStr]) {
+                    groupedByDate[localDateStr] = {
+                        dateStr: localDateStr,
+                        totalPaid: 0,
+                        totalUnpaid: 0,
+                        uncollectedCount: 0,
+                        paidCount: 0,
+                        orderIds: []
+                    };
+                }
+
+                if (order.paymentStatus === 'Paid') {
+                    groupedByDate[localDateStr].totalPaid += order.totalPrice || 0;
+                    groupedByDate[localDateStr].paidCount++;
+                } else {
+                    groupedByDate[localDateStr].totalUnpaid += order.totalPrice || 0;
+                    groupedByDate[localDateStr].uncollectedCount++;
+                }
+                groupedByDate[localDateStr].orderIds.push(order.receiptId);
+            });
+
+            // Convert to array and sort chronological reverse
+            const historyList = Object.values(groupedByDate);
+
+            if (historyList.length === 0) {
+                noData.classList.remove('hidden');
+                tableBody.innerHTML = '';
+                return;
+            } else {
+                noData.classList.add('hidden');
+            }
+
+            tableBody.innerHTML = '';
+            historyList.forEach(day => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 font-semibold text-gray-900">${day.dateStr}</td>
+                    <td class="p-4 text-gray-500">
+                        <span class="font-bold text-navy">${day.paidCount} Pelanggan</span>
+                        ${day.uncollectedCount > 0 ? `<br><span class="text-[10px] text-amber-600 font-semibold">(${day.uncollectedCount} Belum Bayar)</span>` : ''}
+                    </td>
+                    <td class="p-4 text-emerald-700 font-bold">RM ${day.totalPaid.toFixed(2)}</td>
+                    <td class="p-4 text-rose-600 font-medium">RM ${day.totalUnpaid.toFixed(2)}</td>
+                    <td class="p-4">
+                        <button onclick="alertCustom('Analisis ringkas bagi ${day.dateStr}: Jualan Berjaya dikutip RM ${day.totalPaid.toFixed(2)} hasil kutipan daripada ${day.paidCount} pelanggan berdaftar.')" class="px-3 py-1 bg-navy text-white text-[10px] font-bold rounded-lg uppercase tracking-wide hover:bg-slate-800">
+                            Butiran
+                        </button>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // ------------------------------------------------------------
+        // OFFLINE SIMULATOR DATA (FALLBACK SECURITY)
+        // ------------------------------------------------------------
+        function simulateOfflineData() {
+            // Generates local mock orders for offline workspace presentation purposes
+            const todayStrIso = new Date().toISOString();
+            const yesterdayStrIso = new Date(Date.now() - 24 * 3600 * 1000).toISOString();
+
+            globalOrders = [
+                {
+                    receiptId: "WI-7104",
+                    tableNumber: "5",
+                    items: [
+                        { name: "Nasi Lemak Ayam Berempah Ibu", price: 15.90, quantity: 2 },
+                        { name: "Teh Tarik Madu Berbuih", price: 6.50, quantity: 2 }
+                    ],
+                    totalPrice: 44.80,
+                    createdAt: todayStrIso,
+                    paymentStatus: "Unpaid"
+                },
+                {
+                    receiptId: "WI-3921",
+                    tableNumber: "12",
+                    items: [
+                        { name: "Rendang Daging Tok Warisan", price: 18.50, quantity: 1 },
+                        { name: "Cendol Durian D24", price: 12.90, quantity: 1 }
+                    ],
+                    totalPrice: 31.40,
+                    createdAt: todayStrIso,
+                    paymentStatus: "Paid"
+                },
+                {
+                    receiptId: "WI-9021",
+                    tableNumber: "2",
+                    items: [
+                        { name: "Asam Pedas Tetel Melaka", price: 16.90, quantity: 2 },
+                        { name: "Limau Ais Kasturi Pudina", price: 4.50, quantity: 2 }
+                    ],
+                    totalPrice: 42.80,
+                    createdAt: yesterdayStrIso,
+                    paymentStatus: "Paid"
+                }
+            ];
+            renderDashboard();
+        }
+
+        // Custom alert utility (No browser alert)
+        function alertCustom(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = "fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-sm w-11/12 bg-red-950/95 border-2 border-[#c5a850]/50 p-4 rounded-2xl text-center text-white shadow-2xl transition-all duration-300";
+            alertDiv.innerHTML = `
+                <div class="text-[#c5a850] text-2xl mb-2"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <p class="text-xs font-semibold leading-relaxed">${message}</p>
+                <button onclick="this.parentElement.remove()" class="mt-3 px-4 py-1.5 bg-[#c5a850] text-navy font-bold rounded-lg text-[10px] uppercase tracking-wide">Faham</button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv && alertDiv.parentElement) alertDiv.remove();
+            }, 6000);
+        }
+    </script>
+</body>
+</html>
