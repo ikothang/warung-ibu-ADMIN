@@ -118,39 +118,39 @@
             </div>
         </header>
 
-        <!-- LIVE STATS SECTION (ONLY FOR TODAY'S TRANSACTIONS) -->
+        <!-- LIVE STATS SECTION (DYNAMIC LABELS ACCORDING TO THE ACTIVE TAB) -->
         <section class="max-w-7xl mx-auto w-full px-4 pt-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <!-- Today's Revenue Card -->
+                <!-- Sales Revenue Card (Dynamic) -->
                 <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Jualan Hari Ini (Paid)</span>
+                        <span id="salesCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Jualan Hari Ini (Paid)</span>
                         <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todaySales">RM 0.00</h3>
-                        <p class="text-[10px] text-gray-400 mt-1">Berdasarkan pesanan berbayar sahaja</p>
+                        <p id="salesCardSub" class="text-[10px] text-gray-400 mt-1">Berdasarkan pesanan berbayar sahaja hari ini</p>
                     </div>
                     <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100">
                         <i class="fa-solid fa-wallet text-xl"></i>
                     </div>
                 </div>
 
-                <!-- Customers Today Card -->
+                <!-- Customers Card (Dynamic) -->
                 <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
+                        <span id="customersCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
                         <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todayCustomers">0 Resit</h3>
-                        <p class="text-[10px] text-gray-400 mt-1">1 resit pesanan = 1 pelanggan</p>
+                        <p id="customersCardSub" class="text-[10px] text-gray-400 mt-1">1 resit pesanan = 1 pelanggan hari ini</p>
                     </div>
                     <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
                         <i class="fa-solid fa-users text-xl"></i>
                     </div>
                 </div>
 
-                <!-- Unpaid Outstandings Card -->
+                <!-- Unpaid Outstandings Card (Dynamic) -->
                 <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
                     <div>
-                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Kutipan Tertunggak (Unpaid)</span>
+                        <span id="pendingCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Kutipan Tertunggak (Unpaid)</span>
                         <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="pendingPayments">RM 0.00</h3>
-                        <p class="text-[10px] text-gray-400 mt-1">Jumlah amaun dari meja yang belum bayar</p>
+                        <p id="pendingCardSub" class="text-[10px] text-gray-400 mt-1">Jumlah amaun dari meja yang belum bayar</p>
                     </div>
                     <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100">
                         <i class="fa-solid fa-cash-register text-xl"></i>
@@ -161,15 +161,24 @@
 
         <!-- TAB CONTENT: LIVE ORDERS -->
         <section id="tabOrdersContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
-            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
                 <div>
                     <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif Hari Ini</h3>
                     <p class="text-xs text-gray-500 mt-0.5">Sistem ini dikemas kini secara langsung. Pesanan baharu akan auto-masuk di sini.</p>
                 </div>
-                <!-- Saringan Filter Badges (Semua dibuang, tinggal Belum Bayar & Sudah Bayar sahaja) -->
-                <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-gray-200">
-                    <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20">Belum Bayar</button>
-                    <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Sudah Bayar</button>
+                
+                <!-- Written Reference Date & Time for Admin/Cashier -->
+                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
+                    <div class="bg-navy text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm flex items-center gap-2 border border-[#c5a850]/30 w-full sm:w-auto">
+                        <i class="fa-solid fa-calendar-day text-[#c5a850] animate-pulse"></i>
+                        <span id="adminLiveClock" class="tracking-wide">Memuatkan tarikh & masa...</span>
+                    </div>
+
+                    <!-- Saringan Filter Badges (Semua dibuang, tinggal Belum Bayar & Sudah Bayar sahaja) -->
+                    <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm w-full sm:w-auto justify-center">
+                        <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20">Belum Bayar</button>
+                        <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Sudah Bayar</button>
+                    </div>
                 </div>
             </div>
 
@@ -251,11 +260,47 @@
         let db;
         let auth;
         let globalOrders = []; // Memory cache to process orders with standard filters
-        let filterType = 'unpaid'; // Ditukar nilai lalai kepada 'unpaid' kerana penapis 'all' dibuang
+        let filterType = 'unpaid'; // Default active order filter
         let currentTab = 'orders'; // 'orders', 'history'
+
+        // Initialize and Start Jam Digital Bertulis Real-Time
+        function startAdminLiveClock() {
+            const clockElement = document.getElementById('adminLiveClock');
+            if (!clockElement) return;
+
+            function updateTime() {
+                const now = new Date();
+                
+                // Menjana tarikh bersurat melayu tulen
+                const dayNames = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+                const monthNames = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
+                
+                const dayName = dayNames[now.getDay()];
+                const dayNum = now.getDate();
+                const monthName = monthNames[now.getMonth()];
+                const yearNum = now.getFullYear();
+                
+                // Format Masa (AM/PM)
+                const timeString = now.toLocaleTimeString('ms-MY', { 
+                    hour: '2-digit', 
+                    minute: '2-digit', 
+                    second: '2-digit',
+                    hour12: true 
+                }).toUpperCase();
+
+                clockElement.innerHTML = `${dayName}, ${dayNum} ${monthName} ${yearNum} &bull; ${timeString}`;
+            }
+
+            updateTime();
+            setInterval(updateTime, 1000);
+        }
 
         window.addEventListener('DOMContentLoaded', async () => {
             const statusBadge = document.getElementById('connectionBadge');
+            
+            // Memulakan Jam Digital Juruwang
+            startAdminLiveClock();
+
             try {
                 // Initialise Firebase
                 const app = firebase.initializeApp(firebaseConfig);
@@ -287,7 +332,7 @@
             // RULE 1: Fetching strictly from /artifacts/restoran-dd4bd/public/data/orders
             const collectionRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders');
 
-            // Set up active onSnapshot stream listener (RULE 2: Fetch all and sort locally in memory to prevent complex index requirement)
+            // Set up active onSnapshot stream listener (RULE 2: Fetch all and sort locally in memory)
             collectionRef.onSnapshot((querySnapshot) => {
                 globalOrders = [];
                 querySnapshot.forEach((doc) => {
@@ -333,6 +378,34 @@
             document.getElementById('tabOrdersContent').classList.toggle('hidden', tab !== 'orders');
             document.getElementById('tabHistoryContent').classList.toggle('hidden', tab !== 'history');
 
+            // Dynamic card title / labels logic based on current screen
+            const salesCardLabel = document.getElementById('salesCardLabel');
+            const salesCardSub = document.getElementById('salesCardSub');
+            const customersCardLabel = document.getElementById('customersCardLabel');
+            const customersCardSub = document.getElementById('customersCardSub');
+            const pendingCardLabel = document.getElementById('pendingCardLabel');
+            const pendingCardSub = document.getElementById('pendingCardSub');
+
+            if (tab === 'orders') {
+                salesCardLabel.innerText = "Jualan Hari Ini (Paid)";
+                salesCardSub.innerText = "Berdasarkan pesanan berbayar sahaja hari ini";
+                
+                customersCardLabel.innerText = "Pelanggan Hari Ini";
+                customersCardSub.innerText = "1 resit pesanan = 1 pelanggan hari ini";
+                
+                pendingCardLabel.innerText = "Kutipan Tertunggak (Unpaid)";
+                pendingCardSub.innerText = "Jumlah amaun dari meja yang belum bayar";
+            } else {
+                salesCardLabel.innerText = "Jumlah Jualan (Semua Order)";
+                salesCardSub.innerText = "Jumlah jualan bersih terkumpul sepanjang masa";
+                
+                customersCardLabel.innerText = "Jumlah Pelanggan";
+                customersCardSub.innerText = "Jumlah semua pesanan/resit yang pernah dibuat";
+                
+                pendingCardLabel.innerText = "Jumlah Tertunggak Keseluruhan";
+                pendingCardSub.innerText = "Jumlah amaun uncollected sepanjang masa";
+            }
+
             renderDashboard();
         }
 
@@ -358,14 +431,6 @@
         }
 
         function renderDashboard() {
-            if (currentTab === 'history') {
-                renderHistoryTab();
-                return;
-            }
-
-            const liveContainer = document.getElementById('liveOrdersContainer');
-            const noOrdersNotice = document.getElementById('noLiveOrders');
-
             const textTodaySales = document.getElementById('todaySales');
             const textTodayCustomers = document.getElementById('todayCustomers');
             const textPendingPayments = document.getElementById('pendingPayments');
@@ -373,11 +438,37 @@
             // Calculate Today's boundaries (Standard GMT local equivalence)
             const todayStr = new Date().toDateString();
 
-            let salesSum = 0;
-            let pendingSum = 0;
-            let paidCount = 0;
+            if (currentTab === 'history') {
+                // Calculate HISTORICAL global totals across ALL times
+                let globalSalesSum = 0;
+                let globalPendingSum = 0;
+                let globalPaidReceipts = 0;
 
-            // Iterate globally to populate summary statistics for current date ONLY
+                globalOrders.forEach(order => {
+                    const isPaid = (order.paymentStatus === 'Paid');
+                    const orderTotal = Number(order.totalPrice) || 0;
+
+                    if (isPaid) {
+                        globalSalesSum += orderTotal;
+                        globalPaidReceipts++; // Total historical paid orders
+                    } else {
+                        globalPendingSum += orderTotal;
+                    }
+                });
+
+                textTodaySales.innerText = `RM ${globalSalesSum.toFixed(2)}`;
+                textTodayCustomers.innerText = `${globalPaidReceipts} Resit`;
+                textPendingPayments.innerText = `RM ${globalPendingSum.toFixed(2)}`;
+
+                renderHistoryTab();
+                return;
+            }
+
+            // Otherwise, we calculate stats for TODAY'S transactions only
+            let todaySalesSum = 0;
+            let todayPendingSum = 0;
+            let todayPaidReceipts = 0;
+
             globalOrders.forEach(order => {
                 const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
                 const isPaid = (order.paymentStatus === 'Paid');
@@ -386,17 +477,20 @@
                 // Hanya ambil kira pesanan pada TARIKH HARI INI
                 if (orderDate === todayStr) {
                     if (isPaid) {
-                        salesSum += orderTotal;
-                        paidCount++; // 1 paid order = 1 paid customer today
+                        todaySalesSum += orderTotal;
+                        todayPaidReceipts++; 
                     } else {
-                        pendingSum += orderTotal;
+                        todayPendingSum += orderTotal;
                     }
                 }
             });
 
-            textTodaySales.innerText = `RM ${salesSum.toFixed(2)}`;
-            textTodayCustomers.innerText = `${paidCount} Resit`;
-            textPendingPayments.innerText = `RM ${pendingSum.toFixed(2)}`;
+            textTodaySales.innerText = `RM ${todaySalesSum.toFixed(2)}`;
+            textTodayCustomers.innerText = `${todayPaidReceipts} Resit`;
+            textPendingPayments.innerText = `RM ${todayPendingSum.toFixed(2)}`;
+
+            const liveContainer = document.getElementById('liveOrdersContainer');
+            const noOrdersNotice = document.getElementById('noLiveOrders');
 
             // Penapis auto kosongkan pesanan aktif apabila tarikh berubah:
             // Hanya tunjukkan pesanan yang tarikhnya bersamaan hari ini sahaja pada tab Pesanan Aktif
@@ -446,10 +540,20 @@
                     itemsListHtml = `<div class="text-[11px] text-gray-400 italic py-1">Tiada butiran sajian dihantar.</div>`;
                 }
 
-                // Format timestamp untuk dipaparkan di pesanan aktif (Tarikh & Masa Lengkap)
+                // Format timestamp untuk dipaparkan di pesanan aktif (Tarikh & Masa Lengkap Bertulis)
                 const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
-                const displayTimeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-                const displayDateStr = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+                
+                // Menjana nama hari & bulan Melayu
+                const daysInMalay = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+                const monthsInMalay = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
+                
+                const dayStr = daysInMalay[dateObj.getDay()];
+                const dateNum = dateObj.getDate();
+                const monthStr = monthsInMalay[dateObj.getMonth()];
+                const yearNum = dateObj.getFullYear();
+                
+                const displayTimeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
+                const displayFullWrittenDate = `${dayStr}, ${dateNum} ${monthStr} ${yearNum}`;
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
@@ -458,9 +562,9 @@
                             <span class="text-[10px] font-mono block mt-1.5 font-bold text-gray-400">${receiptId}</span>
                         </div>
                         <div class="text-right">
-                            <span class="text-[10px] text-gray-500 font-bold block">${displayDateStr}</span>
-                            <span class="text-[10px] text-amber-600 font-bold block">${displayTimeStr}</span>
-                            <span class="inline-block mt-1.5 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
+                            <span class="text-[11px] text-navy font-extrabold block"><i class="fa-regular fa-calendar-check mr-1 text-[#c5a850]"></i>${displayFullWrittenDate}</span>
+                            <span class="text-[11px] text-amber-600 font-extrabold block"><i class="fa-regular fa-clock mr-1"></i>${displayTimeStr}</span>
+                            <span class="inline-block mt-2 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
                                 ${order.paymentStatus || 'Unpaid'}
                             </span>
                         </div>
@@ -478,11 +582,11 @@
 
                     <div class="pt-2">
                         ${isPaid ? `
-                            <button onclick="togglePaymentStatus('${receiptId}', 'Unpaid')" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-gray-200">
+                            <button onclick="togglePaymentStatus('${receiptId}', 'Unpaid')" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-gray-200 shadow-sm">
                                 <i class="fa-solid fa-rotate-left"></i>Tukar Kepada Unpaid
                             </button>
                         ` : `
-                            <button onclick="togglePaymentStatus('${receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                            <button onclick="togglePaymentStatus('${receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-md">
                                 <i class="fa-solid fa-check"></i>Tanda PAID (Sudah Bayar)
                             </button>
                         `}
