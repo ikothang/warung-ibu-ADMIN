@@ -21,7 +21,7 @@
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-    <!-- Supabase JS Library -->
+    <!-- Supabase JS Library (used in backend code only, hidden from UI) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -105,7 +105,7 @@
                     <div>
                         <h1 class="text-xl font-classic font-bold tracking-wider text-white">WARUNG IBU ADMIN</h1>
                         <div class="flex items-center gap-2 mt-0.5">
-                            <span id="connectionBadge" class="flex items-center gap-1 text-[9px] bg-amber-500/10 text-amber-500 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-bold">
+                            <span id="connectionBadge" class="flex items-center gap-1 text-[9px] bg-[#c5a850]/10 text-[#ecdca5] px-2.5 py-0.5 rounded-full border border-[#c5a850]/20 font-bold">
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENYAMBUNG CLOUD
                             </span>
                         </div>
@@ -237,11 +237,11 @@
             </div>
         </section>
 
-        <!-- TAB CONTENT: SUPABASE MENU MANAGEMENT -->
+        <!-- TAB CONTENT: MENU MANAGEMENT -->
         <section id="tabMenuContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <div class="mb-6">
-                <h3 class="text-xl font-serif-elegant font-bold text-navy">Pengurusan Menu Tradisi (Supabase)</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Tambah menu baharu atau kemas kini sajian tradisi warisan di sini. Gambar dimuat naik terus ke dalam bucket awam Supabase.</p>
+                <h3 class="text-xl font-serif-elegant font-bold text-navy">Pengurusan Menu Tradisi</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Tambah menu baharu atau kemas kini sajian tradisi warisan di sini. Gambar dimuat naik terus ke dalam bucket awam awan.</p>
             </div>
 
             <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
@@ -321,18 +321,18 @@
                 <!-- Live Menu Grid (Right Side) -->
                 <div class="lg:col-span-7 space-y-4">
                     <div class="bg-[#111e29] text-white p-4 rounded-2xl flex justify-between items-center">
-                        <span class="text-xs font-classic tracking-wider uppercase font-bold text-[#c5a850]">Senarai Menu Semasa Supabase</span>
+                        <span class="text-xs font-classic tracking-wider uppercase font-bold text-[#c5a850]">Senarai Menu Semasa</span>
                         <span class="text-[10px]" id="supabaseCount">0 Sajian Berdaftar</span>
                     </div>
 
                     <div id="supabaseMenuGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic items loaded from supabase list_menu table -->
+                        <!-- Dynamic items loaded from database list_menu table -->
                     </div>
 
                     <!-- No menu registered state -->
                     <div id="noSupabaseMenu" class="hidden text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
                         <span class="text-gray-300 text-5xl mb-4 block"><i class="fa-solid fa-bowl-food"></i></span>
-                        <h4 class="font-serif-elegant font-bold text-gray-800 text-sm">Tiada Menu Supabase Berdaftar</h4>
+                        <h4 class="font-serif-elegant font-bold text-gray-800 text-sm">Tiada Menu Berdaftar</h4>
                         <p class="text-xs text-gray-500 mt-1">Gunakan borang bersebelahan untuk memasukkan makanan tradisi pertama anda.</p>
                     </div>
                 </div>
@@ -354,9 +354,7 @@
 
     <!-- INTERACTIVE JAVASCRIPT SYSTEM CONTROLLER -->
     <script>
-        // ------------------------------------------------------------
         // 1. CONFIGURATION & STATE INITIALIZATION
-        // ------------------------------------------------------------
         const firebaseConfig = {
             apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
             authDomain: "restoran-dd4bd.firebaseapp.com",
@@ -368,8 +366,8 @@
             measurementId: "G-GME7877LYX"
         };
 
-        // Supabase Credentials provided by user
-        const supabaseUrl = "https://oojoyzswnnaygfracomu.supabase.co"; // Base URL without /rest/v1/
+        // Supabase Credentials provided by user (kept in code backend, fully removed from visible UI labels)
+        const supabaseUrl = "https://oojoyzswnnaygfracomu.supabase.co"; 
         const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vam95enN3bm5heWdmcmFjb211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Nzk2NDUsImV4cCI6MjA5NzM1NTY0NX0.MfD_3-S1LM3uQ-BJqvsUxr40j2f3yLbc9gYIvEGEwo8";
 
         const appId = typeof __app_id !== 'undefined' ? __app_id : 'restoran-dd4bd';
@@ -381,9 +379,7 @@
         let filterType = 'unpaid'; // Default active order filter
         let currentTab = 'orders'; // 'orders', 'history', 'menu'
 
-        // ------------------------------------------------------------
         // 2. JAM DIGITAL REAL-TIME
-        // ------------------------------------------------------------
         function startAdminLiveClock() {
             const clockElement = document.getElementById('adminLiveClock');
             if (!clockElement) return;
@@ -413,9 +409,7 @@
             setInterval(updateTime, 1000);
         }
 
-        // ------------------------------------------------------------
         // 3. APPLICATION DOM LOAD & CONNECTIONS
-        // ------------------------------------------------------------
         window.addEventListener('DOMContentLoaded', async () => {
             const statusBadge = document.getElementById('connectionBadge');
             startAdminLiveClock();
@@ -428,9 +422,9 @@
 
                 await firebase.auth().signInAnonymously();
                 
-                // Initialize Supabase Client SDK
+                // Initialize Supabase Client SDK (backend usage only)
                 supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
-                console.log("Supabase Client initialized successfully.");
+                console.log("Database Client initialized successfully.");
                 
                 statusBadge.className = "flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold";
                 statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE (CLOUD)`;
@@ -445,9 +439,7 @@
             }
         });
 
-        // ------------------------------------------------------------
         // 4. FIREBASE ORDERS STREAM SNAPSHOT
-        // ------------------------------------------------------------
         function listenToOrders() {
             if (!db) return;
 
@@ -476,9 +468,7 @@
             });
         }
 
-        // ------------------------------------------------------------
         // 5. TABS MANAGER SYSTEM
-        // ------------------------------------------------------------
         function switchTab(tab) {
             currentTab = tab;
             
@@ -526,7 +516,7 @@
 
             renderDashboard();
 
-            // Load Supabase menu database if active tab
+            // Load menu database if active tab
             if (tab === 'menu') {
                 fetchSupabaseMenus();
             }
@@ -547,9 +537,7 @@
             renderDashboard();
         }
 
-        // ------------------------------------------------------------
         // 6. RENDER DASHBOARD METRICS
-        // ------------------------------------------------------------
         function renderDashboard() {
             const textTodaySales = document.getElementById('todaySales');
             const textTodayCustomers = document.getElementById('todayCustomers');
@@ -716,9 +704,7 @@
             });
         }
 
-        // ------------------------------------------------------------
         // 7. FIREBASE HELPERS & MODIFICATIONS
-        // ------------------------------------------------------------
         async function removeItemFromOrder(orderId, itemName) {
             const order = globalOrders.find(o => o.id === orderId);
             if (!order) return;
@@ -855,9 +841,7 @@
             });
         }
 
-        // ------------------------------------------------------------
         // 8. PDF GENERATOR SYSTEM (A6 THERMAL PRINT FORMAT)
-        // ------------------------------------------------------------
         function downloadReceiptPDF(orderId) {
             const order = globalOrders.find(o => o.id === orderId);
             if (!order) return;
@@ -934,9 +918,7 @@
             doc.save(`Resit_WarungIbu_${order.receiptId || order.id}.pdf`);
         }
 
-        // ------------------------------------------------------------
-        // 9. SUPABASE OPERATIONS & UI RENDERING
-        // ------------------------------------------------------------
+        // 9. CLOUD DATABASE MENU OPERATIONS & UI RENDERING
         async function fetchSupabaseMenus() {
             if (!supabaseClient) return;
 
@@ -983,8 +965,8 @@
                 });
 
             } catch (err) {
-                console.error("Gagal mendapatkan menu Supabase:", err);
-                alertCustom("Ralat Supabase: Gagal memuat turun senarai menu semasa.");
+                console.error("Gagal mendapatkan menu:", err);
+                alertCustom("Ralat Sistem: Gagal memuat turun senarai menu semasa.");
             }
         }
 
@@ -1033,7 +1015,7 @@
             let imageUrl = '';
 
             try {
-                // 1. Upload File to Supabase Storage if file selected
+                // 1. Upload File to Storage if file selected
                 if (imageFile) {
                     const fileExt = imageFile.name.split('.').pop();
                     const fileName = `${Date.now()}_menu_item.${fileExt}`;
