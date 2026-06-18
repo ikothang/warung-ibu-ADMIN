@@ -3,112 +3,579 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warung Ibu Admin - Pengurusan & Kasier</title>
+    <title>Warung Ibu Admin - Urusan & Kasier</title>
+    <!-- Tailwind CSS for modern responsive layout -->
     <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts for premium branding look -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
+    <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
+    <!-- Firebase Compatibility SDKs -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
     <style>
-        body { font-family: 'Plus Jakarta Sans', sans-serif; background-color: #fcfbf7; color: #2c2520; }
-        .font-serif-elegant { font-family: 'Playfair Display', serif; }
-        .font-classic { font-family: 'Cinzel', serif; }
-        .batik-light { background-color: #fbf9f3; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23c5a850' fill-opacity='0.04'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23c5a850' fill-opacity='0.15'/%3E%3C/svg%3E"); }
-        .bg-navy { background-color: #111e29; }
+        body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
+            background-color: #fcfbf7;
+            color: #2c2520;
+        }
+        
+        .font-serif-elegant {
+            font-family: 'Playfair Display', serif;
+        }
+        
+        .font-classic {
+            font-family: 'Cinzel', serif;
+        }
+
+        /* Royal Batik Background overlay */
+        .batik-bg {
+            background-color: #111e29;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 0l40 40-40 40L0 40z' fill='%23c5a850' fill-opacity='0.08'/%3E%3Cpath d='M40 10l30 30-30 30-30-30z' fill='%231a2e40' fill-opacity='0.2'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23c5a850' fill-opacity='0.3'/%3E%3C/svg%3E");
+        }
+
+        .batik-light {
+            background-color: #fbf9f3;
+            background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23c5a850' fill-opacity='0.04'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23c5a850' fill-opacity='0.15'/%3E%3C/svg%3E");
+        }
+
+        .text-gold {
+            color: #bfa34a;
+        }
+        
+        .bg-gold {
+            background-color: #bfa34a;
+        }
+
+        .bg-navy {
+            background-color: #111e29;
+        }
+
+        .border-gold-gradient {
+            border-image: linear-gradient(to right, #c5a850, #ecdca5, #c5a850) 1;
+        }
+
+        /* Elegant scrollbar styling */
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #f1f1f1;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #c5a850;
+            border-radius: 10px;
+        }
     </style>
 </head>
 <body class="batik-light min-h-screen flex flex-col justify-between overflow-x-hidden">
 
+    <!-- OVERLAY LOADING SPINNER -->
     <div id="loadingOverlay" class="fixed inset-0 bg-[#111e29] z-50 flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="relative w-24 h-24 mb-4">
             <div class="absolute inset-0 border-4 border-dashed border-[#c5a850] rounded-full animate-spin"></div>
+            <div class="absolute inset-2 border-2 border-double border-white rounded-full flex items-center justify-center">
+                <span class="text-[#c5a850] font-classic font-bold text-lg">WI</span>
+            </div>
         </div>
-        <p class="text-white font-serif-elegant tracking-widest text-lg">Menghubungkan Ke Cloud...</p>
+        <p class="text-white font-serif-elegant tracking-widest text-lg">Menghubungkan Ke Cloud Database...</p>
+        <p class="text-xs text-gray-400 mt-2">Sistem Pengurusan Jualan Juruwang & Pemilik</p>
     </div>
 
     <div class="flex-grow flex flex-col">
+        <!-- Elegant Header -->
         <header class="bg-navy text-white shadow-xl sticky top-0 z-30">
             <div class="h-1 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
-            <div class="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-                <h1 class="text-xl font-classic font-bold tracking-wider text-white">WARUNG IBU ADMIN</h1>
+            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col sm:flex-row justify-between items-center gap-3">
+                <div class="flex items-center gap-3">
+                    <span class="p-2.5 bg-[#c5a850]/15 text-[#c5a850] rounded-xl border border-[#c5a850]/30">
+                        <i class="fa-solid fa-hotel text-lg"></i>
+                    </span>
+                    <div>
+                        <h1 class="text-xl font-classic font-bold tracking-wider text-white">WARUNG IBU ADMIN</h1>
+                        <div class="flex items-center gap-2 mt-0.5">
+                            <span id="connectionBadge" class="flex items-center gap-1 text-[9px] bg-amber-500/10 text-amber-500 px-2.5 py-0.5 rounded-full border border-amber-500/20 font-bold">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENYAMBUNG CLOUD
+                            </span>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Tab Switching Panel -->
                 <div class="flex bg-[#1a2e40] p-1 rounded-xl border border-gray-700/50">
-                    <button onclick="switchTab('orders')" class="px-4 py-2 text-xs font-bold rounded-lg text-navy bg-[#c5a850]">Pesanan Aktif</button>
-                    <button onclick="switchTab('history')" class="px-4 py-2 text-xs font-bold rounded-lg text-gray-300 hover:text-white">Sejarah</button>
+                    <button onclick="switchTab('orders')" id="tabOrders" class="px-5 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]">
+                        <i class="fa-solid fa-utensils mr-1.5"></i>Pesanan Aktif
+                    </button>
+                    <button onclick="switchTab('history')" id="tabHistory" class="px-5 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-chart-line mr-1.5"></i>Sejarah Jualan
+                    </button>
                 </div>
             </div>
         </header>
 
+        <!-- LIVE STATS SECTION -->
+        <section class="max-w-7xl mx-auto w-full px-4 pt-6">
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
+                <!-- Today's Revenue Card -->
+                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Jualan Hari Ini (Paid)</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todaySales">RM 0.00</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Berdasarkan pesanan berbayar sahaja</p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100">
+                        <i class="fa-solid fa-wallet text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Customers Today Card -->
+                <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todayCustomers">0 Resit</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">1 resit pesanan = 1 pelanggan</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Unpaid Outstandings Card -->
+                <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Kutipan Tertunggak (Unpaid)</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="pendingPayments">RM 0.00</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Jumlah amaun dari meja yang belum bayar</p>
+                    </div>
+                    <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100">
+                        <i class="fa-solid fa-cash-register text-xl"></i>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- TAB CONTENT: LIVE ORDERS -->
         <section id="tabOrdersContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
-            <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif Hari Ini</h3>
+                    <p class="text-xs text-gray-500 mt-0.5">Sistem ini dikemas kini secara langsung. Pesanan baharu akan auto-masuk di sini.</p>
+                </div>
+                <!-- Saringan Filter Badges -->
+                <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-gray-200">
+                    <button onclick="setFilter('all')" id="filterAll" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20">Semua</button>
+                    <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Belum Bayar</button>
+                    <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Sudah Bayar</button>
+                </div>
+            </div>
+
+            <!-- Dynamic Orders Grid -->
+            <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                <!-- Javascript will inject cards here automatically -->
+            </div>
+
+            <!-- Empty orders state container -->
+            <div id="noLiveOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
+                <span class="text-gray-300 text-6xl mb-4 block"><i class="fa-solid fa-clipboard-check"></i></span>
+                <h4 class="font-serif-elegant font-bold text-gray-800 text-lg">Tiada Pesanan Berdaftar</h4>
+                <p class="text-xs text-gray-500 mt-1">Sistem bersedia menerima pesanan daripada menu digital pelanggan.</p>
+            </div>
+        </section>
+
+        <!-- TAB CONTENT: HISTORICAL & INCOME STATS -->
+        <section id="tabHistoryContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
+            <div class="mb-6">
+                <h3 class="text-xl font-serif-elegant font-bold text-navy">Sejarah Pendapatan Harian</h3>
+                <p class="text-xs text-gray-500 mt-0.5">Rekod penjejakan jualan terkumpul mengikut hari sebelumnya bagi memantau prestasi restoran.</p>
+            </div>
+
+            <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+                <div class="overflow-x-auto">
+                    <table class="w-full text-left border-collapse">
+                        <thead>
+                            <tr class="bg-navy text-white text-[10px] font-classic tracking-wider uppercase">
+                                <th class="p-4">Tarikh Operasi</th>
+                                <th class="p-4">Bilangan Pelanggan (Resit)</th>
+                                <th class="p-4">Pendapatan Bersih (Paid)</th>
+                                <th class="p-4">Amaun Tertunggak (Unpaid)</th>
+                                <th class="p-4">Pemerhatian</th>
+                            </tr>
+                        </thead>
+                        <tbody id="historyTableBody" class="text-xs text-gray-700 divide-y divide-gray-100">
+                            <!-- Populated dynamically -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <!-- Empty history state -->
+                <div id="noHistoryData" class="hidden text-center py-16">
+                    <span class="text-gray-300 text-5xl mb-3 block"><i class="fa-solid fa-chart-line"></i></span>
+                    <p class="text-xs text-gray-500 font-bold">Tiada Rekod Jualan Lampau Ditemui</p>
+                </div>
+            </div>
         </section>
     </div>
 
+    <!-- Footer block -->
+    <footer class="bg-navy text-gray-400 text-center py-4 border-t border-[#c5a850]/20 text-[11px] tracking-wide relative">
+        <div class="absolute inset-0 opacity-5 batik-bg pointer-events-none"></div>
+        <div class="relative z-10 max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
+            <p>&copy; 2026 Warung Ibu Admin. Hak Cipta Terpelihara.</p>
+            <div class="flex items-center gap-2 text-[#c5a850] font-bold">
+                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
+                <span>Pangkalan Data Cloud Bersambung</span>
+            </div>
+        </div>
+    </footer>
+
+    <!-- INTERACTIVE JAVASCRIPT SYSTEM CONTROLLER -->
     <script>
+        // 1. Firebase Web App Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
             authDomain: "restoran-dd4bd.firebaseapp.com",
+            databaseURL: "https://restoran-dd4bd-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "restoran-dd4bd",
             storageBucket: "restoran-dd4bd.firebasestorage.app",
             messagingSenderId: "44849081363",
-            appId: "1:44849081363:web:1a56f2ebc972f5227be3e6"
+            appId: "1:44849081363:web:1a56f2ebc972f5227be3e6",
+            measurementId: "G-GME7877LYX"
         };
 
-        const appId = 'restoran-dd4bd';
+        const appId = typeof __app_id !== 'undefined' ? __app_id : 'restoran-dd4bd';
+        
         let db;
+        let auth;
+        let globalOrders = []; // Memory cache to process orders with standard filters
+        let filterType = 'all'; // 'all', 'unpaid', 'paid'
+        let currentTab = 'orders'; // 'orders', 'history'
 
         window.addEventListener('DOMContentLoaded', async () => {
+            const statusBadge = document.getElementById('connectionBadge');
             try {
-                if (!firebase.apps.length) {
-                    firebase.initializeApp(firebaseConfig);
-                }
-                db = firebase.firestore();
-                
-                // Menggunakan auth dari instance yang sudah di-initialize
+                // Initialise Firebase
+                const app = firebase.initializeApp(firebaseConfig);
+                auth = firebase.auth(app);
+                db = firebase.firestore(app);
+
+                // Authenticate before any DB Query (RULE 3)
                 await firebase.auth().signInAnonymously();
                 
+                console.log("Firebase initialized successfully on Admin page.");
+                
+                statusBadge.className = "flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold";
+                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE (CLOUD)`;
+
+                // Start Live Firestore Streaming (onSnapshot)
                 listenToOrders();
+
             } catch (err) {
                 console.error("Firebase Initialization Error:", err);
+                statusBadge.className = "flex items-center gap-1 text-[9px] bg-red-500/10 text-red-500 px-2.5 py-0.5 rounded-full border border-red-500/20 font-bold";
+                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> OFFLINE / TIADA SAMBUNGAN`;
+                document.getElementById('loadingOverlay').classList.add('hidden');
             }
         });
 
         function listenToOrders() {
+            if (!db) return;
+
+            // RULE 1: Fetching strictly from /artifacts/restoran-dd4bd/public/data/orders
             const collectionRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders');
+
+            // Set up active onSnapshot stream listener (RULE 2: Fetch all and sort locally in memory to prevent complex index requirement)
             collectionRef.onSnapshot((querySnapshot) => {
-                const liveOrdersGrid = document.getElementById('liveOrdersContainer');
-                liveOrdersGrid.innerHTML = '';
-                
+                globalOrders = [];
                 querySnapshot.forEach((doc) => {
-                    const order = doc.data();
-                    const card = document.createElement('div');
-                    card.className = "p-5 rounded-2xl border bg-white shadow-sm";
-                    card.innerHTML = `
-                        <div class="flex justify-between mb-4">
-                            <span class="text-xs bg-navy text-white px-2 py-1 rounded">MEJA ${order.tableNumber || '?'}</span>
-                            <span class="text-[10px] font-bold ${order.paymentStatus === 'Paid' ? 'text-emerald-600' : 'text-red-600'}">${order.paymentStatus || 'Unpaid'}</span>
-                        </div>
-                        <p class="text-xl font-bold mb-4">RM ${Number(order.totalPrice || 0).toFixed(2)}</p>
-                        <button onclick="togglePaymentStatus('${doc.id}', '${order.paymentStatus === 'Paid' ? 'Unpaid' : 'Paid'}')" class="w-full py-2 bg-[#c5a850] rounded text-xs font-bold">
-                            Tukar Status
-                        </button>
-                    `;
-                    liveOrdersGrid.appendChild(card);
+                    globalOrders.push({
+                        id: doc.id,
+                        ...doc.data()
+                    });
                 });
+
+                // Defensive sorting by ISO Date string descending (most recent first)
+                globalOrders.sort((a, b) => {
+                    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
+                    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
+                    return dateB - dateA;
+                });
+
+                console.log("Live stream updated! Count: ", globalOrders.length);
+                
+                // Refresh rendering displays
+                renderDashboard();
+
+                // Dismiss loader safely once initial sync completes
                 document.getElementById('loadingOverlay').classList.add('hidden');
+            }, (err) => {
+                console.error("onSnapshot failed to load:", err);
+                alertCustom("Gagal memuat turun data real-time. Sila periksa status kebenaran Firebase.");
+            });
+        }
+
+        function switchTab(tab) {
+            currentTab = tab;
+            
+            // Adjust buttons active styling
+            document.getElementById('tabOrders').className = (tab === 'orders') 
+                ? "px-5 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]"
+                : "px-5 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
+
+            document.getElementById('tabHistory').className = (tab === 'history')
+                ? "px-5 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]"
+                : "px-5 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
+
+            // Toggle panels visible classes
+            document.getElementById('tabOrdersContent').classList.toggle('hidden', tab !== 'orders');
+            document.getElementById('tabHistoryContent').classList.toggle('hidden', tab !== 'history');
+
+            renderDashboard();
+        }
+
+        function setFilter(type) {
+            filterType = type;
+            
+            // Adjust buttons styling
+            document.querySelectorAll('[id^="filter"]').forEach(btn => {
+                btn.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy";
+            });
+
+            const activeBtnMap = {
+                'all': 'filterAll',
+                'unpaid': 'filterUnpaid',
+                'paid': 'filterPaid'
+            };
+
+            const targetBtn = document.getElementById(activeBtnMap[type]);
+            if (targetBtn) {
+                targetBtn.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20";
+            }
+
+            renderDashboard();
+        }
+
+        function renderDashboard() {
+            if (currentTab === 'history') {
+                renderHistoryTab();
+                return;
+            }
+
+            const liveContainer = document.getElementById('liveOrdersContainer');
+            const noOrdersNotice = document.getElementById('noLiveOrders');
+
+            const textTodaySales = document.getElementById('todaySales');
+            const textTodayCustomers = document.getElementById('todayCustomers');
+            const textPendingPayments = document.getElementById('pendingPayments');
+
+            // Calculate Today's boundaries (Standard GMT local equivalence)
+            const todayStr = new Date().toDateString();
+
+            let salesSum = 0;
+            let pendingSum = 0;
+            let paidCount = 0;
+
+            // Iterate globally to populate summary statistics for current date
+            globalOrders.forEach(order => {
+                const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
+                const isPaid = (order.paymentStatus === 'Paid');
+                const orderTotal = Number(order.totalPrice) || 0;
+
+                // Overall outstanding (regardless of date, so cashier knows all pending invoices)
+                if (!isPaid) {
+                    pendingSum += orderTotal;
+                }
+
+                // If ordered today, compute relative metrics
+                if (orderDate === todayStr) {
+                    if (isPaid) {
+                        salesSum += orderTotal;
+                        paidCount++;
+                    }
+                }
+            });
+
+            textTodaySales.innerText = `RM ${salesSum.toFixed(2)}`;
+            textTodayCustomers.innerText = `${paidCount} Resit`;
+            textPendingPayments.innerText = `RM ${pendingSum.toFixed(2)}`;
+
+            // Filter out items matching current sub-category filter choices
+            let listToDisplay = globalOrders;
+            if (filterType === 'unpaid') {
+                listToDisplay = globalOrders.filter(o => o.paymentStatus !== 'Paid');
+            } else if (filterType === 'paid') {
+                listToDisplay = globalOrders.filter(o => o.paymentStatus === 'Paid');
+            }
+
+            if (listToDisplay.length === 0) {
+                noOrdersNotice.classList.remove('hidden');
+                liveContainer.classList.add('hidden');
+                return;
+            }
+
+            noOrdersNotice.classList.add('hidden');
+            liveContainer.classList.remove('hidden');
+            liveContainer.innerHTML = '';
+
+            listToDisplay.forEach(order => {
+                const isPaid = (order.paymentStatus === 'Paid');
+                const orderTotal = Number(order.totalPrice) || 0;
+                const receiptId = order.receiptId || order.id || 'WI-UNKNOWN';
+
+                const card = document.createElement('div');
+                card.className = `p-5 rounded-2xl border transition-all duration-300 ${isPaid ? 'bg-white/70 border-gray-100 opacity-75' : 'bg-white border-[#c5a850]/40 shadow-md hover:shadow-lg'}`;
+
+                // Parse items array
+                let itemsListHtml = '';
+                const items = Array.isArray(order.items) ? order.items : [];
+                items.forEach(it => {
+                    itemsListHtml += `
+                        <div class="flex justify-between items-center text-xs py-1.5 border-b border-gray-100 last:border-0 text-gray-700">
+                            <span><span class="font-bold text-navy">${it.quantity}x</span> ${it.name}</span>
+                            <span class="font-semibold text-gray-900">RM ${(it.price * it.quantity).toFixed(2)}</span>
+                        </div>
+                    `;
+                });
+
+                if (items.length === 0) {
+                    itemsListHtml = `<div class="text-[11px] text-gray-400 italic py-1">Tiada butiran sajian dihantar.</div>`;
+                }
+
+                // Format timestamp
+                const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
+                const displayTimeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                const displayDateStr = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+
+                card.innerHTML = `
+                    <div class="flex justify-between items-start mb-4">
+                        <div>
+                            <span class="text-xs bg-navy text-white font-bold px-3 py-1 rounded-lg">MEJA ${order.tableNumber || '?'}</span>
+                            <span class="text-[10px] font-mono block mt-1.5 font-bold text-gray-400">${receiptId}</span>
+                        </div>
+                        <div class="text-right">
+                            <span class="text-[10px] text-gray-500 block">${displayDateStr} &bull; ${displayTimeStr}</span>
+                            <span class="inline-block mt-1 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
+                                ${order.paymentStatus || 'Unpaid'}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="space-y-1 mb-4 bg-gray-50/70 p-3 rounded-xl border border-gray-100">
+                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Butiran Pesanan</p>
+                        ${itemsListHtml}
+                    </div>
+
+                    <div class="flex justify-between items-center mb-4 pt-1 border-t border-gray-50">
+                        <span class="text-xs font-bold text-gray-500">Jumlah Kasar:</span>
+                        <span class="text-lg font-serif-elegant font-bold text-emerald-800">RM ${orderTotal.toFixed(2)}</span>
+                    </div>
+
+                    <div class="pt-2">
+                        ${isPaid ? `
+                            <button onclick="togglePaymentStatus('${receiptId}', 'Unpaid')" class="w-full py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-gray-200">
+                                <i class="fa-solid fa-rotate-left"></i>Tukar Kepada Unpaid
+                            </button>
+                        ` : `
+                            <button onclick="togglePaymentStatus('${receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 shadow-sm">
+                                <i class="fa-solid fa-check"></i>Tanda PAID (Sudah Bayar)
+                            </button>
+                        `}
+                    </div>
+                `;
+                liveContainer.appendChild(card);
             });
         }
 
         async function togglePaymentStatus(receiptId, newStatus) {
+            if (!db) return;
             try {
+                // RULE 1: Updating document strictly under public paths structure
                 await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).update({
                     paymentStatus: newStatus
                 });
-            } catch(e) {
-                console.error(e);
+                console.log(`Document ${receiptId} successfully updated to: ${newStatus}`);
+            } catch (err) {
+                console.error("Error updating transaction status:", err);
+                alertCustom("Masalah sambungan dikesan semasa mengemas kini status bayaran.");
             }
+        }
+
+        function renderHistoryTab() {
+            const tableBody = document.getElementById('historyTableBody');
+            const noData = document.getElementById('noHistoryData');
+
+            // Group transactions by Date locally
+            const dateGroups = {};
+
+            globalOrders.forEach(order => {
+                const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
+                const key = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'long', year: 'numeric' });
+
+                if (!dateGroups[key]) {
+                    dateGroups[key] = {
+                        dateStr: key,
+                        totalPaidSum: 0,
+                        totalUnpaidSum: 0,
+                        totalReceipts: 0
+                    };
+                }
+
+                const isPaid = (order.paymentStatus === 'Paid');
+                const orderTotal = Number(order.totalPrice) || 0;
+
+                if (isPaid) {
+                    dateGroups[key].totalPaidSum += orderTotal;
+                    dateGroups[key].totalReceipts++;
+                } else {
+                    dateGroups[key].totalUnpaidSum += orderTotal;
+                }
+            });
+
+            const records = Object.values(dateGroups);
+
+            if (records.length === 0) {
+                noData.classList.remove('hidden');
+                tableBody.innerHTML = '';
+                return;
+            }
+
+            noData.classList.add('hidden');
+            tableBody.innerHTML = '';
+
+            records.forEach(row => {
+                const tr = document.createElement('tr');
+                tr.className = "hover:bg-slate-50 transition-colors";
+                tr.innerHTML = `
+                    <td class="p-4 font-bold text-gray-900">${row.dateStr}</td>
+                    <td class="p-4 text-gray-600 font-semibold">${row.totalReceipts} Pelanggan Berbayar</td>
+                    <td class="p-4 text-emerald-700 font-bold">RM ${row.totalPaidSum.toFixed(2)}</td>
+                    <td class="p-4 text-amber-600 font-medium">RM ${row.totalUnpaidSum.toFixed(2)}</td>
+                    <td class="p-4">
+                        <span class="text-[10px] bg-navy/10 text-navy font-bold px-2 py-1 rounded">Selesai Harian</span>
+                    </td>
+                `;
+                tableBody.appendChild(tr);
+            });
+        }
+
+        // Helper custom alert overlay
+        function alertCustom(message) {
+            const alertDiv = document.createElement('div');
+            alertDiv.className = "fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-sm w-11/12 bg-red-950/95 border-2 border-[#c5a850]/50 p-4 rounded-2xl text-center text-white shadow-2xl transition-all duration-300";
+            alertDiv.innerHTML = `
+                <div class="text-[#c5a850] text-2xl mb-2"><i class="fa-solid fa-circle-exclamation"></i></div>
+                <p class="text-xs font-semibold leading-relaxed">${message}</p>
+                <button onclick="this.parentElement.remove()" class="mt-3 px-4 py-1.5 bg-[#c5a850] text-navy font-bold rounded-lg text-[10px] uppercase tracking-wide">Faham</button>
+            `;
+            document.body.appendChild(alertDiv);
+            
+            setTimeout(() => {
+                if (alertDiv && alertDiv.parentElement) alertDiv.remove();
+            }, 5000);
         }
     </script>
 </body>
