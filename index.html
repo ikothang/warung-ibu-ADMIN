@@ -125,7 +125,7 @@
         <section class="max-w-7xl mx-auto w-full px-4 pt-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <!-- Sales Revenue Card -->
-                <div class="bg-white p-5 rounded-2xl border border-emerald-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="salesCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Jualan Hari Ini (Paid)</span>
                         <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todaySales">RM 0.00</h3>
@@ -137,7 +137,7 @@
                 </div>
 
                 <!-- Customers Card -->
-                <div class="bg-white p-5 rounded-2xl border border-blue-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="customersCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
                         <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todayCustomers">0 Resit</h3>
@@ -149,7 +149,7 @@
                 </div>
 
                 <!-- Unpaid Outstandings Card -->
-                <div class="bg-white p-5 rounded-2xl border border-amber-100 shadow-sm flex items-center justify-between">
+                <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="pendingCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Kutipan Tertunggak (Unpaid)</span>
                         <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="pendingPayments">RM 0.00</h3>
@@ -509,7 +509,13 @@
                     itemsListHtml += `
                         <div class="flex justify-between items-center text-xs py-1.5 border-b border-gray-100 last:border-0 text-gray-700">
                             <span><span class="font-bold text-navy">${it.quantity}x</span> ${it.name}</span>
-                            <span class="font-semibold text-gray-900">RM ${(it.price * it.quantity).toFixed(2)}</span>
+                            <div class="flex items-center gap-2.5">
+                                <span class="font-semibold text-gray-900">RM ${(it.price * it.quantity).toFixed(2)}</span>
+                                <!-- Item Cancellation Button -->
+                                <button onclick="removeItemFromOrder('${receiptId}', '${it.name}')" class="text-rose-500 hover:text-rose-700 transition duration-150 p-1" title="Buang Sajian Ini">
+                                    <i class="fa-solid fa-trash-can"></i>
+                                </button>
+                            </div>
                         </div>
                     `;
                 });
@@ -565,7 +571,7 @@
                             </button>
                         ` : `
                             <button onclick="togglePaymentStatus('${receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-md">
-                                <i class="fa-solid fa-check"></i> PAID
+                                PAID
                             </button>
                         `}
                         
@@ -577,6 +583,67 @@
                 `;
                 liveContainer.appendChild(card);
             });
+        }
+
+        // Custom item removal logic (removes only 1 menu within the order)
+        async function removeItemFromOrder(receiptId, itemName) {
+            const order = globalOrders.find(o => (o.receiptId || o.id) === receiptId);
+            if (!order) return;
+
+            // Render a clean modal box for validation confirmation
+            const modal = document.createElement('div');
+            modal.className = "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300";
+            modal.innerHTML = `
+                <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
+                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-rose-600"></div>
+                    <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-rose-500/10 text-rose-500">
+                        <i class="fa-solid fa-circle-exclamation text-2xl animate-pulse"></i>
+                    </div>
+                    <h3 class="text-xl font-classic font-bold text-navy mb-2">Buang Hidangan?</h3>
+                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Adakah anda pasti mahu membuang sajian <span class="font-bold text-gray-800">${itemName}</span> daripada pesanan ini?</p>
+                    <div class="flex gap-3">
+                        <button id="cancelItemModalBtn" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">Kembali</button>
+                        <button id="confirmItemModalBtn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-200">Ya, Buang</button>
+                    </div>
+                </div>
+            `;
+            document.body.appendChild(modal);
+
+            modal.querySelector('#cancelItemModalBtn').onclick = () => modal.remove();
+            modal.querySelector('#confirmItemModalBtn').onclick = async () => {
+                modal.remove();
+                
+                // Filter out the selected menu item
+                const updatedItems = order.items.filter(item => item.name !== itemName);
+                
+                // Recalculate total price
+                const updatedTotal = updatedItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+
+                if (db) {
+                    try {
+                        if (updatedItems.length === 0) {
+                            // If order contains no more items, delete the whole document safely
+                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).delete();
+                            console.log("Entire order was deleted since it had no remaining items.");
+                        } else {
+                            // Update items array and totalPrice on Firebase Cloud Database
+                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).update({
+                                items: updatedItems,
+                                totalPrice: updatedTotal
+                            });
+                            console.log("Specific item was removed. Price recalculated successfully.");
+                        }
+                    } catch (error) {
+                        console.error("Gagal mengemaskini item: ", error);
+                        alertCustom("Masalah sambungan dikesan semasa membuang menu.");
+                    }
+                } else {
+                    // Fallback local memory modifications
+                    order.items = updatedItems;
+                    order.totalPrice = updatedTotal;
+                    renderDashboard();
+                }
+            };
         }
 
         // Beautiful confirmation pop-up custom modal instead of unsafe windows.confirm
