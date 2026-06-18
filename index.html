@@ -246,7 +246,6 @@
 
     <!-- INTERACTIVE JAVASCRIPT SYSTEM CONTROLLER -->
     <script>
-        // 1. Firebase Web App Configuration
         const firebaseConfig = {
             apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
             authDomain: "restoran-dd4bd.firebaseapp.com",
@@ -331,7 +330,7 @@
                 globalOrders = [];
                 querySnapshot.forEach((doc) => {
                     globalOrders.push({
-                        id: doc.id,
+                        id: doc.id, // Ambil id dokumen sebenar
                         ...doc.data()
                     });
                 });
@@ -424,6 +423,7 @@
             const todayStr = new Date().toDateString();
 
             if (currentTab === 'history') {
+                // Perbaharui analisis tab Sejarah Jualan
                 let globalSalesSum = 0;
                 let globalPendingSum = 0;
                 let globalPaidReceipts = 0;
@@ -448,6 +448,7 @@
                 return;
             }
 
+            // Metrik Hari Ini Sahaja
             let todaySalesSum = 0;
             let todayPendingSum = 0;
             let todayPaidReceipts = 0;
@@ -474,12 +475,11 @@
             const liveContainer = document.getElementById('liveOrdersContainer');
             const noOrdersNotice = document.getElementById('noLiveOrders');
 
-            // Filter out orders that belong to yesterday onwards if they are PAID.
-            // Unpaid orders will always remain in active list regardless of date.
+            // Syarat Ketat: Hanya pesanan bertarikh HARI INI sahaja dipaparkan pada tab Pesanan Aktif.
+            // Sebarang pesanan bertarikh kelmarin/sebelum ini dikosongkan dan dimasukkan ke sejarah jualan.
             let listToDisplay = globalOrders.filter(order => {
                 const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
-                const isPaid = (order.paymentStatus === 'Paid');
-                return !isPaid || orderDate === todayStr;
+                return orderDate === todayStr;
             });
 
             if (filterType === 'unpaid') {
@@ -511,8 +511,8 @@
                             <span><span class="font-bold text-navy">${it.quantity}x</span> ${it.name}</span>
                             <div class="flex items-center gap-2.5">
                                 <span class="font-semibold text-gray-900">RM ${(it.price * it.quantity).toFixed(2)}</span>
-                                <!-- Item Cancellation Button -->
-                                <button onclick="removeItemFromOrder('${receiptId}', '${it.name}')" class="text-rose-500 hover:text-rose-700 transition duration-150 p-1" title="Buang Sajian Ini">
+                                <!-- Item Cancellation Button (Directly binds order.id to guarantee execution) -->
+                                <button onclick="removeItemFromOrder('${order.id}', '${it.name}')" class="text-rose-500 hover:text-rose-700 transition duration-150 p-1" title="Buang Sajian Ini">
                                     <i class="fa-solid fa-trash-can"></i>
                                 </button>
                             </div>
@@ -566,17 +566,17 @@
 
                     <div class="pt-2 flex flex-col gap-2">
                         ${isPaid ? `
-                            <button onclick="togglePaymentStatus('${receiptId}', 'Unpaid')" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-gray-200 shadow-sm">
+                            <button onclick="togglePaymentStatus('${order.id}', 'Unpaid')" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-gray-200 shadow-sm">
                                 <i class="fa-solid fa-rotate-left"></i>Tukar Kepada Unpaid
                             </button>
                         ` : `
-                            <button onclick="togglePaymentStatus('${receiptId}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-md">
+                            <button onclick="togglePaymentStatus('${order.id}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-md">
                                 PAID
                             </button>
                         `}
                         
                         <!-- Cancel Order Button (Delete directly from Firestore) -->
-                        <button onclick="confirmDeleteOrder('${receiptId}')" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border border-rose-200">
+                        <button onclick="confirmDeleteOrder('${order.id}')" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border border-rose-200">
                             <i class="fa-solid fa-trash-can"></i> Batal Pesanan
                         </button>
                     </div>
@@ -585,9 +585,8 @@
             });
         }
 
-        // Custom item removal logic (removes only 1 menu within the order)
-        async function removeItemFromOrder(receiptId, itemName) {
-            const order = globalOrders.find(o => (o.receiptId || o.id) === receiptId);
+        async function removeItemFromOrder(orderId, itemName) {
+            const order = globalOrders.find(o => o.id === orderId);
             if (!order) return;
 
             // Render a clean modal box for validation confirmation
@@ -613,21 +612,21 @@
             modal.querySelector('#confirmItemModalBtn').onclick = async () => {
                 modal.remove();
                 
-                // Filter out the selected menu item
+                // Tapis tatasusunan (array) pesanan untuk membuang item pilihan
                 const updatedItems = order.items.filter(item => item.name !== itemName);
                 
-                // Recalculate total price
+                // Kira semula jumlah harga bersih baharu
                 const updatedTotal = updatedItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
 
                 if (db) {
                     try {
                         if (updatedItems.length === 0) {
-                            // If order contains no more items, delete the whole document safely
-                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).delete();
+                            // Jika tiada lagi hidangan berbaki dalam resit, padam terus dokumen tersebut secara selamat
+                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).delete();
                             console.log("Entire order was deleted since it had no remaining items.");
                         } else {
-                            // Update items array and totalPrice on Firebase Cloud Database
-                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).update({
+                            // Kemas kini tatasusunan items dan totalPrice pada Cloud Firestore
+                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).update({
                                 items: updatedItems,
                                 totalPrice: updatedTotal
                             });
@@ -638,7 +637,7 @@
                         alertCustom("Masalah sambungan dikesan semasa membuang menu.");
                     }
                 } else {
-                    // Fallback local memory modifications
+                    // Failback memori sekiranya tiada sambungan
                     order.items = updatedItems;
                     order.totalPrice = updatedTotal;
                     renderDashboard();
@@ -647,7 +646,7 @@
         }
 
         // Beautiful confirmation pop-up custom modal instead of unsafe windows.confirm
-        function confirmDeleteOrder(receiptId) {
+        function confirmDeleteOrder(orderId) {
             const modal = document.createElement('div');
             modal.className = "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300";
             modal.innerHTML = `
@@ -657,7 +656,7 @@
                         <i class="fa-solid fa-trash-can text-2xl animate-bounce"></i>
                     </div>
                     <h3 class="text-xl font-classic font-bold text-navy mb-2">Batal Pesanan?</h3>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Adakah anda pasti mahu membatalkan atau memadam pesanan <span class="font-bold text-gray-800 font-mono">${receiptId}</span> ini? Tindakan ini akan memadam rekod di dapur kekal.</p>
+                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Adakah anda pasti mahu membatalkan atau memadam keseluruhan pesanan ini secara kekal? Tindakan ini tidak boleh diundurkan.</p>
                     <div class="flex gap-3">
                         <button id="cancelModalBtn" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">Kembali</button>
                         <button id="confirmModalBtn" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-200">Ya, Batal</button>
@@ -671,25 +670,26 @@
                 modal.remove();
                 if (db) {
                     try {
-                        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).delete();
+                        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).delete();
+                        console.log("Order deleted completely from Firestore.");
                     } catch (error) {
                         console.error("Gagal memadam pesanan: ", error);
                         alertCustom("Masalah sambungan dikesan semasa memadam pesanan.");
                     }
                 } else {
-                    globalOrders = globalOrders.filter(o => (o.receiptId || o.id) !== receiptId);
+                    globalOrders = globalOrders.filter(o => o.id !== orderId);
                     renderDashboard();
                 }
             };
         }
 
-        async function togglePaymentStatus(receiptId, newStatus) {
+        async function togglePaymentStatus(orderId, newStatus) {
             if (!db) return;
             try {
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(receiptId).update({
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).update({
                     paymentStatus: newStatus
                 });
-                console.log(`Document ${receiptId} successfully updated to: ${newStatus}`);
+                console.log(`Document ${orderId} successfully updated to: ${newStatus}`);
             } catch (err) {
                 console.error("Error updating transaction status:", err);
                 alertCustom("Masalah sambungan dikesan semasa mengemas kini status bayaran.");
@@ -732,7 +732,7 @@
                         </span>
                     </td>
                     <td class="p-4 text-center">
-                        <button onclick="downloadReceiptPDF('${receiptId}')" class="px-3 py-1.5 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-[10px] font-bold rounded-lg uppercase tracking-wide transition flex items-center justify-center gap-1.5 mx-auto shadow-sm">
+                        <button onclick="downloadReceiptPDF('${order.id}')" class="px-3 py-1.5 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-[10px] font-bold rounded-lg uppercase tracking-wide transition flex items-center justify-center gap-1.5 mx-auto shadow-sm">
                             <i class="fa-solid fa-file-pdf"></i> PDF Resit
                         </button>
                     </td>
@@ -742,7 +742,7 @@
         }
 
         function downloadReceiptPDF(orderId) {
-            const order = globalOrders.find(o => (o.receiptId || o.id) === orderId);
+            const order = globalOrders.find(o => o.id === orderId);
             if (!order) return;
             
             const { jsPDF } = window.jspdf;
