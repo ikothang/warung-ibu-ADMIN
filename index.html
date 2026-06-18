@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Warung Ibu Admin - Urusan & Kasier</title>
+    <title>Warung Ibu Admin - Urusan & Juruwang</title>
     <!-- Tailwind CSS for modern responsive layout -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Google Fonts for premium branding look -->
@@ -118,7 +118,7 @@
             </div>
         </header>
 
-        <!-- LIVE STATS SECTION -->
+        <!-- LIVE STATS SECTION (ONLY FOR TODAY'S TRANSACTIONS) -->
         <section class="max-w-7xl mx-auto w-full px-4 pt-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <!-- Today's Revenue Card -->
@@ -166,10 +166,9 @@
                     <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif Hari Ini</h3>
                     <p class="text-xs text-gray-500 mt-0.5">Sistem ini dikemas kini secara langsung. Pesanan baharu akan auto-masuk di sini.</p>
                 </div>
-                <!-- Saringan Filter Badges -->
+                <!-- Saringan Filter Badges (Semua dibuang, tinggal Belum Bayar & Sudah Bayar sahaja) -->
                 <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-gray-200">
-                    <button onclick="setFilter('all')" id="filterAll" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20">Semua</button>
-                    <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Belum Bayar</button>
+                    <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20">Belum Bayar</button>
                     <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Sudah Bayar</button>
                 </div>
             </div>
@@ -252,7 +251,7 @@
         let db;
         let auth;
         let globalOrders = []; // Memory cache to process orders with standard filters
-        let filterType = 'all'; // 'all', 'unpaid', 'paid'
+        let filterType = 'unpaid'; // Ditukar nilai lalai kepada 'unpaid' kerana penapis 'all' dibuang
         let currentTab = 'orders'; // 'orders', 'history'
 
         window.addEventListener('DOMContentLoaded', async () => {
@@ -346,7 +345,6 @@
             });
 
             const activeBtnMap = {
-                'all': 'filterAll',
                 'unpaid': 'filterUnpaid',
                 'paid': 'filterPaid'
             };
@@ -379,22 +377,19 @@
             let pendingSum = 0;
             let paidCount = 0;
 
-            // Iterate globally to populate summary statistics for current date
+            // Iterate globally to populate summary statistics for current date ONLY
             globalOrders.forEach(order => {
                 const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
                 const isPaid = (order.paymentStatus === 'Paid');
                 const orderTotal = Number(order.totalPrice) || 0;
 
-                // Overall outstanding (regardless of date, so cashier knows all pending invoices)
-                if (!isPaid) {
-                    pendingSum += orderTotal;
-                }
-
-                // If ordered today, compute relative metrics
+                // Hanya ambil kira pesanan pada TARIKH HARI INI
                 if (orderDate === todayStr) {
                     if (isPaid) {
                         salesSum += orderTotal;
-                        paidCount++;
+                        paidCount++; // 1 paid order = 1 paid customer today
+                    } else {
+                        pendingSum += orderTotal;
                     }
                 }
             });
@@ -403,12 +398,18 @@
             textTodayCustomers.innerText = `${paidCount} Resit`;
             textPendingPayments.innerText = `RM ${pendingSum.toFixed(2)}`;
 
-            // Filter out items matching current sub-category filter choices
-            let listToDisplay = globalOrders;
+            // Penapis auto kosongkan pesanan aktif apabila tarikh berubah:
+            // Hanya tunjukkan pesanan yang tarikhnya bersamaan hari ini sahaja pada tab Pesanan Aktif
+            let listToDisplay = globalOrders.filter(order => {
+                const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
+                return orderDate === todayStr;
+            });
+
+            // Tapis mengikut sub-saringan (Belum Bayar / Sudah Bayar)
             if (filterType === 'unpaid') {
-                listToDisplay = globalOrders.filter(o => o.paymentStatus !== 'Paid');
+                listToDisplay = listToDisplay.filter(o => o.paymentStatus !== 'Paid');
             } else if (filterType === 'paid') {
-                listToDisplay = globalOrders.filter(o => o.paymentStatus === 'Paid');
+                listToDisplay = listToDisplay.filter(o => o.paymentStatus === 'Paid');
             }
 
             if (listToDisplay.length === 0) {
@@ -429,7 +430,7 @@
                 const card = document.createElement('div');
                 card.className = `p-5 rounded-2xl border transition-all duration-300 ${isPaid ? 'bg-white/70 border-gray-100 opacity-75' : 'bg-white border-[#c5a850]/40 shadow-md hover:shadow-lg'}`;
 
-                // Parse items array
+                // Parse items array safely
                 let itemsListHtml = '';
                 const items = Array.isArray(order.items) ? order.items : [];
                 items.forEach(it => {
@@ -445,10 +446,10 @@
                     itemsListHtml = `<div class="text-[11px] text-gray-400 italic py-1">Tiada butiran sajian dihantar.</div>`;
                 }
 
-                // Format timestamp
+                // Format timestamp untuk dipaparkan di pesanan aktif (Tarikh & Masa Lengkap)
                 const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
                 const displayTimeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-                const displayDateStr = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short' });
+                const displayDateStr = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
 
                 card.innerHTML = `
                     <div class="flex justify-between items-start mb-4">
@@ -457,8 +458,9 @@
                             <span class="text-[10px] font-mono block mt-1.5 font-bold text-gray-400">${receiptId}</span>
                         </div>
                         <div class="text-right">
-                            <span class="text-[10px] text-gray-500 block">${displayDateStr} &bull; ${displayTimeStr}</span>
-                            <span class="inline-block mt-1 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
+                            <span class="text-[10px] text-gray-500 font-bold block">${displayDateStr}</span>
+                            <span class="text-[10px] text-amber-600 font-bold block">${displayTimeStr}</span>
+                            <span class="inline-block mt-1.5 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
                                 ${order.paymentStatus || 'Unpaid'}
                             </span>
                         </div>
@@ -508,7 +510,7 @@
             const tableBody = document.getElementById('historyTableBody');
             const noData = document.getElementById('noHistoryData');
 
-            // Group transactions by Date locally
+            // Group transactions by Date locally (Semua rekod lama dan baru akan dihimpunkan di sini mengikut hari)
             const dateGroups = {};
 
             globalOrders.forEach(order => {
