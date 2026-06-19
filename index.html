@@ -4,25 +4,24 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Warung Ibu Admin</title>
-    <!-- Tailwind CSS for utility styles -->
+    <!-- Tailwind CSS for modern responsive dashboard -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts for branding & design -->
+    <!-- Google Fonts for branding & elegant typography -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
-    <!-- jsPDF library for elegant receipt PDF generation -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
-
-    <!-- Firebase Compatibility SDKs -->
+    <!-- Firebase SDKs (Compatibility versions for globally scoped vanilla objects) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-    <!-- Supabase JS Library (used in backend code only, hidden from UI) -->
+    <!-- Cloud Database SDK Client (No visible labels for security) -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <!-- jsPDF for thermal style billing receipts download -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
     <style>
         body {
@@ -39,7 +38,7 @@
             font-family: 'Cinzel', serif;
         }
 
-        /* Royal Batik Background overlay */
+        /* Royal Batik Classic Theme Colors */
         .batik-bg {
             background-color: #111e29;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 0l40 40-40 40L0 40z' fill='%23c5a850' fill-opacity='0.08'/%3E%3Cpath d='M40 10l30 30-30 30-30-30z' fill='%231a2e40' fill-opacity='0.2'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23c5a850' fill-opacity='0.3'/%3E%3C/svg%3E");
@@ -50,25 +49,13 @@
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23c5a850' fill-opacity='0.04'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23c5a850' fill-opacity='0.15'/%3E%3C/svg%3E");
         }
 
-        .text-gold {
-            color: #bfa34a;
-        }
-        
-        .bg-gold {
-            background-color: #bfa34a;
-        }
-
         .bg-navy {
             background-color: #111e29;
         }
 
-        .border-gold-gradient {
-            border-image: linear-gradient(to right, #c5a850, #ecdca5, #c5a850) 1;
-        }
-
-        /* Elegant scrollbar styling */
         ::-webkit-scrollbar {
             width: 6px;
+            height: 6px;
         }
         ::-webkit-scrollbar-track {
             background: #f1f1f1;
@@ -89,79 +76,82 @@
                 <span class="text-[#c5a850] font-classic font-bold text-lg">WI</span>
             </div>
         </div>
-        <p class="text-white font-serif-elegant tracking-widest text-lg">Menghubungkan Ke Cloud Database...</p>
-        <p class="text-xs text-gray-400 mt-2">Sistem Pengurusan Jualan Juruwang & Pemilik</p>
+        <p class="text-white font-serif-elegant tracking-widest text-lg">Menghubungkan Ke Cloud...</p>
+        <p class="text-xs text-gray-400 mt-2">Urus Jualan, Pesanan & Menu Warisan</p>
     </div>
 
+    <!-- MAIN DASHBOARD WRAPPER -->
     <div class="flex-grow flex flex-col">
-        <!-- Elegant Header -->
+        
+        <!-- Sticky Elegant Header -->
         <header class="bg-navy text-white shadow-xl sticky top-0 z-30">
             <div class="h-1 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
-            <div class="max-w-7xl mx-auto px-4 py-3 flex flex-col lg:flex-row justify-between items-center gap-3">
+            <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
                 <div class="flex items-center gap-3">
-                    <span class="p-2.5 bg-[#c5a850]/15 text-[#c5a850] rounded-xl border border-[#c5a850]/30">
-                        <i class="fa-solid fa-hotel text-lg"></i>
+                    <span class="p-2 bg-[#c5a850]/15 text-[#c5a850] rounded-xl border border-[#c5a850]/30">
+                        <i class="fa-solid fa-desktop text-xl"></i>
                     </span>
                     <div>
-                        <h1 class="text-xl font-classic font-bold tracking-wider text-white">WARUNG IBU ADMIN</h1>
-                        <div class="flex items-center gap-2 mt-0.5">
-                            <span id="connectionBadge" class="flex items-center gap-1 text-[9px] bg-[#c5a850]/10 text-[#ecdca5] px-2.5 py-0.5 rounded-full border border-[#c5a850]/20 font-bold">
-                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENYAMBUNG CLOUD
+                        <div class="flex items-center gap-2">
+                            <h1 class="text-xl font-classic font-bold tracking-wider text-white">WARUNG IBU ADMIN</h1>
+                            <span id="connectionBadge" class="flex items-center gap-1 text-[9px] bg-amber-500/10 text-[#c5a850] px-2.5 py-0.5 rounded-full border border-[#c5a850]/30 font-bold">
+                                <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENYAMBUNG
                             </span>
                         </div>
+                        <p class="text-[10px] text-gray-300">Sistem Bersepadu &bull; Urus Jualan, Jejaki Pesanan & Kemas Kini Menu</p>
                     </div>
                 </div>
                 
-                <!-- Tab Switching Panel -->
-                <div class="flex flex-wrap bg-[#1a2e40] p-1 rounded-xl border border-gray-700/50 justify-center">
-                    <button onclick="switchTab('orders')" id="tabOrders" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]">
-                        <i class="fa-solid fa-utensils mr-1.5"></i>Pesanan Aktif
+                <!-- Navigation Tabs -->
+                <div class="flex bg-[#1a2e40]/90 p-1 rounded-xl border border-gray-700/50">
+                    <button onclick="switchTab('orders')" id="tabOrders" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850] shadow">
+                        <i class="fa-solid fa-receipt mr-1"></i> Pesanan Aktif
                     </button>
                     <button onclick="switchTab('history')" id="tabHistory" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white">
-                        <i class="fa-solid fa-chart-line mr-1.5"></i>Sejarah Jualan
+                        <i class="fa-solid fa-history mr-1"></i> Sejarah Jualan
                     </button>
                     <button onclick="switchTab('menu')" id="tabMenu" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white">
-                        <i class="fa-solid fa-folder-plus mr-1.5"></i>Urus Menu
+                        <i class="fa-solid fa-folder-plus mr-1"></i> Urus Menu
                     </button>
                 </div>
             </div>
         </header>
 
-        <!-- LIVE STATS SECTION -->
-        <section class="max-w-7xl mx-auto w-full px-4 pt-6">
+        <!-- STATS SECTION: DYNAMICALLY SWITCHES LABELS / HIDES ON MENU TAB -->
+        <section id="statsSection" class="max-w-7xl mx-auto w-full px-4 pt-6">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
-                <!-- Sales Revenue Card -->
+                <!-- Sales Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
-                        <span id="salesCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Jualan Hari Ini (Paid)</span>
-                        <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todaySales">RM 0.00</h3>
-                        <p id="salesCardSub" class="text-[10px] text-gray-400 mt-1">Berdasarkan pesanan berbayar sahaja hari ini</p>
+                        <span id="labelSalesCard" class="text-[10px] font-bold uppercase tracking-wider text-[#c5a850] block mb-1">Jumlah Jualan Hari Ini</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-gray-800" id="todaySales">RM 0.00</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Sajian terjual berstatus <span class="font-bold text-emerald-600">PAID</span></p>
                     </div>
-                    <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100">
-                        <i class="fa-solid fa-wallet text-xl"></i>
+                    <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-[#c5a850] border border-[#c5a850]/20">
+                        <i class="fa-solid fa-coins text-xl"></i>
                     </div>
                 </div>
 
-                <!-- Customers Card -->
+                <!-- Customers Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
-                        <span id="customersCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
-                        <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="todayCustomers">0 Resit</h3>
-                        <p id="customersCardSub" class="text-[10px] text-gray-400 mt-1">1 resit pesanan = 1 pelanggan hari ini</p>
+                        <span id="labelCustomerCard" class="text-[10px] font-bold uppercase tracking-wider text-[#c5a850] block mb-1">Pelanggan Hari Ini</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-gray-800" id="todayCustomers">0 Orang</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Jumlah rekod pesanan unik berbayar</p>
                     </div>
-                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
+                    <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-[#c5a850] border border-[#c5a850]/20">
                         <i class="fa-solid fa-users text-xl"></i>
                     </div>
                 </div>
 
-                <!-- Unpaid Outstandings Card -->
+                <!-- Unpaid Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
-                        <span id="pendingCardLabel" class="text-[10px] font-bold uppercase tracking-wider text-amber-600 block mb-1">Kutipan Tertunggak (Unpaid)</span>
-                        <h3 class="text-3xl font-serif-elegant font-bold text-slate-800" id="pendingPayments">RM 0.00</h3>
-                        <p id="pendingCardSub" class="text-[10px] text-gray-400 mt-1">Jumlah amaun dari meja yang belum bayar</p>
+                        <span id="labelPendingCard" class="text-[10px] font-bold uppercase tracking-wider text-rose-600 block mb-1">Menunggu Bayaran (Unpaid)</span>
+                        <h3 class="text-3xl font-serif-elegant font-bold text-rose-800" id="pendingPayments">RM 0.00</h3>
+                        <p class="text-[10px] text-gray-400 mt-1">Baki bil aktif yang belum dijelaskan</p>
                     </div>
-                    <div class="w-12 h-12 bg-amber-50 rounded-2xl flex items-center justify-center text-amber-600 border border-amber-100">
+                    <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 border border-rose-100">
                         <i class="fa-solid fa-cash-register text-xl"></i>
                     </div>
                 </div>
@@ -170,1005 +160,997 @@
 
         <!-- TAB CONTENT: LIVE ORDERS -->
         <section id="tabOrdersContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
-            <div class="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4 mb-6">
+            <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
-                    <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif Hari Ini</h3>
-                    <p class="text-xs text-gray-500 mt-0.5">Sistem ini dikemas kini secara langsung. Pesanan baharu akan auto-masuk di sini.</p>
+                    <div class="flex items-center gap-2">
+                        <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif</h3>
+                        <!-- Live Clock for Cashier and Admin -->
+                        <span id="adminLiveClock" class="text-xs bg-slate-200 text-slate-800 font-mono px-3 py-1 rounded-lg border border-slate-300 font-bold">
+                            Memuatkan masa...
+                        </span>
+                    </div>
+                    <p class="text-xs text-gray-500 mt-1">Menguruskan bil meja pelanggan berstatus Belum Bayar atau Sudah Bayar hari ini.</p>
                 </div>
-                
-                <div class="flex flex-wrap items-center gap-3 w-full lg:w-auto">
-                    <div class="bg-navy text-white px-4 py-2 rounded-xl text-xs font-bold shadow-sm flex items-center gap-2 border border-[#c5a850]/30 w-full sm:w-auto">
-                        <i class="fa-solid fa-calendar-day text-[#c5a850] animate-pulse"></i>
-                        <span id="adminLiveClock" class="tracking-wide">Memuatkan tarikh & masa...</span>
-                    </div>
 
-                    <!-- Filter Buttons (Belum Bayar & Sudah Bayar) -->
-                    <div class="flex items-center gap-1.5 bg-white p-1.5 rounded-xl border border-gray-200 shadow-sm w-full sm:w-auto justify-center">
-                        <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20">Belum Bayar</button>
-                        <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy">Sudah Bayar</button>
-                    </div>
+                <!-- Filters -->
+                <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg border border-gray-200">
+                    <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-navy shadow-sm">Belum Bayar</button>
+                    <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-md text-gray-600 hover:text-navy">Sudah Bayar</button>
                 </div>
             </div>
 
-            <!-- Dynamic Orders Grid -->
-            <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                <!-- Javascript will inject cards here automatically -->
-            </div>
+            <!-- Grid orders monitor -->
+            <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-            <!-- Empty orders state container -->
-            <div id="noLiveOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                <span class="text-gray-300 text-6xl mb-4 block"><i class="fa-solid fa-clipboard-check"></i></span>
-                <h4 class="font-serif-elegant font-bold text-gray-800 text-lg">Tiada Pesanan Berdaftar</h4>
-                <p class="text-xs text-gray-500 mt-1">Sistem bersedia menerima pesanan daripada menu digital pelanggan.</p>
+            <!-- Empty State -->
+            <div id="noLiveOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-[#c5a850]/20 shadow-sm">
+                <i class="fa-solid fa-clipboard-check text-5xl text-[#c5a850] mb-4 animate-bounce"></i>
+                <h4 class="font-bold text-gray-800">Tiada Rekod Dijumpai</h4>
+                <p class="text-xs text-gray-400 mt-1">Semua pesanan meja diselesaikan atau tiada pesanan baru direkodkan hari ini.</p>
             </div>
         </section>
 
-        <!-- TAB CONTENT: HISTORICAL & INCOME STATS -->
+        <!-- TAB CONTENT: HISTORY -->
         <section id="tabHistoryContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
-            <div class="mb-6">
-                <h3 class="text-xl font-serif-elegant font-bold text-navy">Senarai Rekod & Sejarah Jualan</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Rekod penjejakan transaksi jualan keseluruhan. Anda boleh memuat turun dokumen resit rasmi berformat PDF bagi setiap pesanan.</p>
+            <!-- Header Title and Date Filter Row -->
+            <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
+                <div>
+                    <h3 class="text-xl font-serif-elegant font-bold text-navy">Sejarah Pendapatan Jualan</h3>
+                </div>
+                <!-- Interactive Date Selector -->
+                <div class="flex flex-wrap items-center gap-2">
+                    <label for="historyDateFilter" class="text-xs font-bold text-gray-600">Pilih Tarikh:</label>
+                    <input type="date" id="historyDateFilter" onchange="renderDashboard()" 
+                        class="px-3 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850] bg-white text-navy font-semibold">
+                    <button onclick="clearHistoryDateFilter()" 
+                        class="px-3 py-1.5 text-xs bg-gray-200 hover:bg-[#c5a850] text-navy font-bold rounded-lg transition">
+                        Semua Tarikh
+                    </button>
+                </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-gray-100 shadow-md overflow-hidden">
+            <div class="bg-white rounded-2xl border border-[#c5a850]/20 shadow-md overflow-hidden">
+                <div class="p-4 bg-navy text-white flex justify-between items-center">
+                    <span class="text-xs font-classic tracking-wider uppercase font-bold">Senarai Bil Keseluruhan</span>
+                    <span id="filteredCountLabel" class="text-[10px] text-gray-300">Tersusun mengikut waktu transaksi terbaru</span>
+                </div>
+                
                 <div class="overflow-x-auto">
-                    <table class="w-full text-left border-collapse">
-                        <thead>
-                            <tr class="bg-navy text-white text-[10px] font-classic tracking-wider uppercase">
-                                <th class="p-4">Resit ID</th>
-                                <th class="p-4">No Meja</th>
+                    <table class="w-full text-left">
+                        <thead class="bg-amber-50/50 text-[10px] uppercase text-gray-500 border-b border-gray-100">
+                            <tr>
                                 <th class="p-4">Tarikh & Masa</th>
-                                <th class="p-4">Pendapatan Bersih (RM)</th>
+                                <th class="p-4">ID Resit</th>
+                                <th class="p-4">No. Meja</th>
+                                <th class="p-4">Jumlah Harga</th>
                                 <th class="p-4">Status Bayaran</th>
-                                <th class="p-4 text-center">Tindakan</th>
+                                <th class="p-4">Tindakan</th>
                             </tr>
                         </thead>
-                        <tbody id="historyTableBody" class="text-xs text-gray-700 divide-y divide-gray-100">
-                            <!-- Populated dynamically with individual orders for PDF downloads -->
-                        </tbody>
+                        <tbody id="historyTableBody" class="text-xs text-gray-700 divide-y divide-gray-100"></tbody>
                     </table>
                 </div>
 
-                <!-- Empty history state -->
                 <div id="noHistoryData" class="hidden text-center py-16">
-                    <span class="text-gray-300 text-5xl mb-3 block"><i class="fa-solid fa-chart-line"></i></span>
-                    <p class="text-xs text-gray-500 font-bold">Tiada Rekod Jualan Lampau Ditemui</p>
+                    <i class="fa-solid fa-receipt text-4xl text-gray-300 mb-3"></i>
+                    <p class="text-xs text-gray-400 font-bold">Tiada Rekod Sejarah Dijumpai</p>
                 </div>
             </div>
         </section>
 
-        <!-- TAB CONTENT: MENU MANAGEMENT -->
+        <!-- TAB CONTENT: URUS MENU (SUPABASE INTEGRATION) -->
         <section id="tabMenuContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
-            <div class="mb-6">
-                <h3 class="text-xl font-serif-elegant font-bold text-navy">Pengurusan Menu Tradisi</h3>
-                <p class="text-xs text-gray-500 mt-0.5">Tambah menu baharu atau kemas kini sajian tradisi warisan di sini. Gambar dimuat naik terus ke dalam bucket awam awan.</p>
-            </div>
-
-            <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
-                <!-- Form Urus Menu (Left Side) -->
-                <div class="lg:col-span-5 bg-white p-6 rounded-3xl border border-[#c5a850]/20 shadow-md relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1 bg-[#c5a850]"></div>
-                    <h4 class="font-classic font-bold text-navy text-sm mb-4 border-b border-gray-100 pb-2 flex justify-between items-center">
-                        <span id="formMenuTitle">Tambah Sajian Baharu</span>
-                        <button onclick="resetMenuForm()" class="text-xs text-rose-600 font-sans font-bold hover:underline hidden" id="btnCancelEdit">Batal Edit</button>
-                    </h4>
-
-                    <form id="menuForm" class="space-y-4" onsubmit="handleMenuFormSubmit(event)">
-                        <input type="hidden" id="menuId">
-                        
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Nama Sajian *</label>
-                            <input type="text" id="menuName" required placeholder="Contoh: Nasi Dagang Pantai Timur" class="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
+            <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                
+                <!-- Left panel: Form (Add/Edit Menu) -->
+                <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
+                            <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-edit"></i></span>
+                            <h3 id="formTitle" class="text-base font-classic font-bold text-navy">Tambah Sajian Baharu</h3>
                         </div>
 
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Kategori *</label>
-                            <select id="menuCategory" required class="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
-                                <option value="makanan">Makanan</option>
-                                <option value="minuman">Minuman</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Harga Sajian (RM) *</label>
-                            <input type="number" step="0.01" id="menuPrice" required placeholder="0.00" class="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Penerangan/Deskripsi Sajian</label>
-                            <textarea id="menuDesc" rows="3" placeholder="Tulis huraian menarik untuk memikat selera pembeli..." class="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a850]"></textarea>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Muat Naik Gambar Sajian</label>
-                            <div class="flex items-center justify-center w-full">
-                                <label class="flex flex-col items-center justify-center w-full h-24 border-2 border-dashed border-gray-300 rounded-2xl cursor-pointer hover:bg-gray-50 hover:border-[#c5a850] transition">
-                                    <div class="flex flex-col items-center justify-center pt-2 pb-2">
-                                        <i class="fa-solid fa-cloud-arrow-up text-gray-400 text-lg mb-1" id="uploadIcon"></i>
-                                        <p class="text-[10px] text-gray-400" id="uploadText">Klik untuk memuat naik fail</p>
-                                    </div>
-                                    <input type="file" id="menuImageFile" accept="image/*" class="hidden" onchange="previewSelectedImage(event)">
-                                </label>
-                            </div>
-                            <div id="imagePreviewContainer" class="hidden mt-3 relative">
-                                <img id="imagePreview" src="" class="w-full h-32 object-cover rounded-xl border border-gray-100">
-                                <button type="button" onclick="clearImagePreview()" class="absolute top-2 right-2 p-1.5 bg-black/60 hover:bg-black text-white text-xs rounded-full"><i class="fa-solid fa-times"></i></button>
-                            </div>
-                        </div>
-
-                        <div class="grid grid-cols-2 gap-3">
+                        <!-- Form Fields -->
+                        <form id="menuForm" class="space-y-4">
+                            <input type="hidden" id="editMenuId" value="">
+                            
                             <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Badge (Opsional)</label>
-                                <input type="text" id="menuBadge" placeholder="Contoh: Terlaris" class="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
+                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Nama Sajian <span class="text-red-500">*</span></label>
+                                <input type="text" id="menuName" required placeholder="Contoh: Nasi Lemak Sambal Sotong" 
+                                    class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
                             </div>
-                            <div>
-                                <label class="block text-[10px] font-bold text-gray-500 uppercase tracking-wider mb-1.5">Warna Badge</label>
-                                <select id="menuBadgeColor" class="w-full text-xs p-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
-                                    <option value="bg-red-500 text-white">Merah (Popular)</option>
-                                    <option value="bg-[#c5a850] text-navy">Emas (Premium)</option>
-                                    <option value="bg-amber-600 text-white">Oren (Istimewa)</option>
-                                    <option value="bg-emerald-600 text-white">Hijau (Sihat)</option>
-                                </select>
-                            </div>
-                        </div>
 
-                        <button type="submit" id="btnSubmitMenu" class="w-full py-3.5 bg-[#c5a850] text-navy font-bold uppercase tracking-wider text-xs font-classic rounded-xl shadow-md glow-button hover:bg-[#ebd89b] transition">
-                            Hantar & Simpan Menu
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Kategori <span class="text-red-500">*</span></label>
+                                    <select id="menuCategory" required class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
+                                        <option value="makanan">Makanan</option>
+                                        <option value="minuman">Minuman</option>
+                                    </select>
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Harga (RM) <span class="text-red-500">*</span></label>
+                                    <input type="number" step="0.10" id="menuPrice" required placeholder="0.00" 
+                                        class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
+                                </div>
+                            </div>
+
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Penerangan Menu (Copywriting) <span class="text-red-500">*</span></label>
+                                <textarea id="menuDescription" required rows="3" placeholder="Penerangan menarik rasa yang memikat selera..." 
+                                    class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]"></textarea>
+                            </div>
+
+                            <!-- Optional Badge Info -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Badge (Pilihan)</label>
+                                    <input type="text" id="menuBadge" placeholder="Contoh: Terlaris" 
+                                        class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Warna Badge</label>
+                                    <select id="menuBadgeColor" class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
+                                        <option value="bg-red-500 text-white">Merah (Terlaris)</option>
+                                        <option value="bg-amber-500 text-navy">Emas (Istimewa)</option>
+                                        <option value="bg-blue-500 text-white">Biru (Baru)</option>
+                                        <option value="bg-emerald-500 text-white">Hijau (Sihat)</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            <!-- Image Upload Container -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Gambar Sajian <span class="text-red-500">*</span></label>
+                                <div class="flex items-center gap-3">
+                                    <input type="file" id="menuImageFile" accept="image/*" class="hidden" onchange="previewSelectedImage(this)">
+                                    <button type="button" onclick="document.getElementById('menuImageFile').click()" 
+                                        class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-200 flex items-center gap-1.5">
+                                        <i class="fa-solid fa-cloud-arrow-up text-[#c5a850]"></i> Pilih Fail
+                                    </button>
+                                    <span id="selectedFileName" class="text-[10px] text-gray-400 truncate max-w-[150px]">Tiada gambar dipilih</span>
+                                </div>
+                                <div class="mt-3 aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center relative">
+                                    <img id="imagePreview" src="" alt="Pratonton" class="w-full h-full object-cover hidden">
+                                    <span id="previewPlaceholder" class="text-xs text-gray-400"><i class="fa-solid fa-image text-xl block text-center mb-1 text-gray-300"></i> Pratonton Gambar</span>
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+
+                    <!-- Action buttons -->
+                    <div class="pt-4 border-t border-gray-100 flex gap-2 mt-4">
+                        <button type="button" onclick="cancelMenuEdit()" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold uppercase transition">
+                            Batal
                         </button>
-                    </form>
-                </div>
-
-                <!-- Live Menu Grid (Right Side) -->
-                <div class="lg:col-span-7 space-y-4">
-                    <div class="bg-[#111e29] text-white p-4 rounded-2xl flex justify-between items-center">
-                        <span class="text-xs font-classic tracking-wider uppercase font-bold text-[#c5a850]">Senarai Menu Semasa</span>
-                        <span class="text-[10px]" id="supabaseCount">0 Sajian Berdaftar</span>
-                    </div>
-
-                    <div id="supabaseMenuGrid" class="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <!-- Dynamic items loaded from database list_menu table -->
-                    </div>
-
-                    <!-- No menu registered state -->
-                    <div id="noSupabaseMenu" class="hidden text-center py-20 bg-white rounded-3xl border border-gray-100 shadow-sm">
-                        <span class="text-gray-300 text-5xl mb-4 block"><i class="fa-solid fa-bowl-food"></i></span>
-                        <h4 class="font-serif-elegant font-bold text-gray-800 text-sm">Tiada Menu Berdaftar</h4>
-                        <p class="text-xs text-gray-500 mt-1">Gunakan borang bersebelahan untuk memasukkan makanan tradisi pertama anda.</p>
+                        <button type="button" onclick="saveMenuToCloud()" id="btnSaveMenu" class="flex-1 py-2.5 bg-[#111e29] hover:bg-[#c5a850] text-white hover:text-[#111e29] rounded-xl text-xs font-bold uppercase transition flex items-center justify-center gap-1">
+                            <i class="fa-solid fa-save"></i> Simpan
+                        </button>
                     </div>
                 </div>
+
+                <!-- Right panel: Existing Menu Items Table (Cloud synced) -->
+                <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md lg:col-span-2 flex flex-col justify-between">
+                    <div>
+                        <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
+                            <h3 class="text-base font-classic font-bold text-navy">Senarai Sajian Berdaftar</h3>
+                            <span id="cloudMenuCount" class="text-xs bg-amber-50 text-[#c5a850] border border-[#c5a850]/20 px-2.5 py-0.5 rounded-full font-bold">0 Sajian</span>
+                        </div>
+
+                        <!-- Menu list table view -->
+                        <div class="overflow-x-auto max-h-[500px]">
+                            <table class="w-full text-left">
+                                <thead class="bg-amber-50/50 text-[9px] uppercase text-gray-500 border-b border-gray-100 sticky top-0">
+                                    <tr>
+                                        <th class="p-3">Sajian</th>
+                                        <th class="p-3">Kategori</th>
+                                        <th class="p-3">Harga</th>
+                                        <th class="p-3 text-right">Tindakan</th>
+                                    </tr>
+                                </thead>
+                                <tbody id="cloudMenuTableBody" class="text-xs text-gray-700 divide-y divide-gray-100">
+                                    <!-- Sync populated -->
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
             </div>
         </section>
+
     </div>
 
-    <!-- Footer block -->
+    <!-- FOOTER -->
     <footer class="bg-navy text-gray-400 text-center py-4 border-t border-[#c5a850]/20 text-[11px] tracking-wide relative">
         <div class="absolute inset-0 opacity-5 batik-bg pointer-events-none"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <p>&copy; 2026 Warung Ibu Admin. Hak Cipta Terpelihara.</p>
-            <div class="flex items-center gap-2 text-[#c5a850] font-bold">
-                <span class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></span>
-                <span>Pangkalan Data Cloud Bersambung</span>
-            </div>
+            <p>&copy; 2026 Warung Ibu Admin. Sistem Pentadbiran Jualan Bersepadu.</p>
+            <p class="text-xs text-gray-400">Penyambungan Pintar Melalui Awan</p>
         </div>
     </footer>
 
-    <!-- INTERACTIVE JAVASCRIPT SYSTEM CONTROLLER -->
     <script>
-        // 1. CONFIGURATION & STATE INITIALIZATION
+        // Database credentials
         const firebaseConfig = {
             apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
             authDomain: "restoran-dd4bd.firebaseapp.com",
-            databaseURL: "https://restoran-dd4bd-default-rtdb.asia-southeast1.firebasedatabase.app",
             projectId: "restoran-dd4bd",
             storageBucket: "restoran-dd4bd.firebasestorage.app",
             messagingSenderId: "44849081363",
-            appId: "1:44849081363:web:1a56f2ebc972f5227be3e6",
-            measurementId: "G-GME7877LYX"
+            appId: "1:44849081363:web:1a56f2ebc972f5227be3e6"
         };
 
-        // Supabase Credentials provided by user (kept in code backend, fully removed from visible UI labels)
-        const supabaseUrl = "https://oojoyzswnnaygfracomu.supabase.co"; 
-        const supabaseAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vam95enN3bm5heWdmcmFjb211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Nzk2NDUsImV4cCI6MjA5NzM1NTY0NX0.MfD_3-S1LM3uQ-BJqvsUxr40j2f3yLbc9gYIvEGEwo8";
+        const cloudDbUrl = "https://oojoyzswnnaygfracomu.supabase.co";
+        const cloudDbAnonKey = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im9vam95enN3bm5heWdmcmFjb211Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODE3Nzk2NDUsImV4cCI6MjA5NzM1NTY0NX0.MfD_3-S1LM3uQ-BJqvsUxr40j2f3yLbc9gYIvEGEwo8";
 
-        const appId = typeof __app_id !== 'undefined' ? __app_id : 'restoran-dd4bd';
+        const appId = 'restoran-dd4bd';
         
         let db;
         let auth;
-        let supabaseClient;
-        let globalOrders = []; // Memory cache to process orders
-        let filterType = 'unpaid'; // Default active order filter
-        let currentTab = 'orders'; // 'orders', 'history', 'menu'
+        let cloudClient;
+        let globalOrders = [];
+        let globalMenus = [];
+        let filterType = 'unpaid'; // Default filter to Unpaid
+        let currentTab = 'orders'; // Default tab to Orders
 
-        // 2. JAM DIGITAL REAL-TIME
-        function startAdminLiveClock() {
-            const clockElement = document.getElementById('adminLiveClock');
-            if (!clockElement) return;
+        window.addEventListener('DOMContentLoaded', async () => {
+            startAdminClock();
+
+            try {
+                // Initialize Firebase SDK Compat
+                if (!firebase.apps.length) {
+                    firebase.initializeApp(firebaseConfig);
+                }
+                db = firebase.firestore();
+                auth = firebase.auth();
+
+                // Authenticate before any query checks
+                await auth.signInAnonymously();
+
+                // Initialize Cloud Database Client
+                cloudClient = supabase.createClient(cloudDbUrl, cloudDbAnonKey);
+
+                // Set up visual state connection online
+                const badge = document.getElementById('connectionBadge');
+                badge.className = "flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE`;
+
+                // Fire real-time listener for orders and populate menus
+                listenToOrders();
+                fetchCloudMenus();
+
+            } catch (err) {
+                console.error("Firebase Auth or DB Error:", err);
+                const badge = document.getElementById('connectionBadge');
+                badge.className = "flex items-center gap-1 text-[9px] bg-rose-500/10 text-rose-500 px-2.5 py-0.5 rounded-full border border-rose-500/20 font-bold";
+                badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-rose-500"></span> OFFLINE`;
+            } finally {
+                // Clear loading screen
+                setTimeout(() => {
+                    document.getElementById('loadingOverlay').classList.add('opacity-0');
+                    setTimeout(() => {
+                        document.getElementById('loadingOverlay').classList.add('hidden');
+                    }, 300);
+                }, 800);
+            }
+        });
+
+        // ------------------------------------------------------------
+        // FIRESTORE LIVE ORDERS LISTENER
+        // ------------------------------------------------------------
+        function listenToOrders() {
+            if (!db) return;
+
+            const collectionRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders');
+            collectionRef.onSnapshot((querySnapshot) => {
+                globalOrders = [];
+                querySnapshot.forEach((doc) => {
+                    globalOrders.push({ id: doc.id, ...doc.data() });
+                });
+
+                // Render metrics and list
+                renderDashboard();
+            }, (err) => {
+                console.error("Failed to sync live orders: ", err);
+            });
+        }
+
+        // ------------------------------------------------------------
+        // LIVE DIGITAL CLOCK DISPLAY (MALAY)
+        // ------------------------------------------------------------
+        function startAdminClock() {
+            const clockEl = document.getElementById('adminLiveClock');
+            if (!clockEl) return;
+
+            const days = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
+            const months = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
 
             function updateTime() {
                 const now = new Date();
-                
-                const dayNames = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
-                const monthNames = ["Januari", "Februari", "Mac", "April", "Mei", "Jun", "Julai", "Ogos", "September", "Oktober", "November", "Disember"];
-                
-                const dayName = dayNames[now.getDay()];
+                const dayName = days[now.getDay()];
                 const dayNum = now.getDate();
-                const monthName = monthNames[now.getMonth()];
-                const yearNum = now.getFullYear();
-                
-                const timeString = now.toLocaleTimeString('ms-MY', { 
-                    hour: '2-digit', 
-                    minute: '2-digit', 
-                    second: '2-digit',
-                    hour12: true 
-                }).toUpperCase();
+                const monthName = months[now.getMonth()];
+                const year = now.getFullYear();
 
-                clockElement.innerHTML = `${dayName}, ${dayNum} ${monthName} ${yearNum} &bull; ${timeString}`;
+                const timeStr = now.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+                clockEl.innerHTML = `<i class="fa-regular fa-calendar-days text-[#c5a850] mr-1.5"></i> ${dayName}, ${dayNum} ${monthName} ${year} &bull; ${timeStr}`;
             }
 
             updateTime();
             setInterval(updateTime, 1000);
         }
 
-        // 3. APPLICATION DOM LOAD & CONNECTIONS
-        window.addEventListener('DOMContentLoaded', async () => {
-            const statusBadge = document.getElementById('connectionBadge');
-            startAdminLiveClock();
-
-            try {
-                // Initialize Firebase SDK
-                const app = firebase.initializeApp(firebaseConfig);
-                auth = firebase.auth(app);
-                db = firebase.firestore(app);
-
-                await firebase.auth().signInAnonymously();
-                
-                // Initialize Supabase Client SDK (backend usage only)
-                supabaseClient = supabase.createClient(supabaseUrl, supabaseAnonKey);
-                console.log("Database Client initialized successfully.");
-                
-                statusBadge.className = "flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold";
-                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE (CLOUD)`;
-
-                listenToOrders();
-
-            } catch (err) {
-                console.error("Initialization Error:", err);
-                statusBadge.className = "flex items-center gap-1 text-[9px] bg-red-500/10 text-red-500 px-2.5 py-0.5 rounded-full border border-red-500/20 font-bold";
-                statusBadge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-red-500"></span> OFFLINE / TIADA SAMBUNGAN`;
-                document.getElementById('loadingOverlay').classList.add('hidden');
-            }
-        });
-
-        // 4. FIREBASE ORDERS STREAM SNAPSHOT
-        function listenToOrders() {
-            if (!db) return;
-
-            const collectionRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders');
-
-            collectionRef.onSnapshot((querySnapshot) => {
-                globalOrders = [];
-                querySnapshot.forEach((doc) => {
-                    globalOrders.push({
-                        id: doc.id,
-                        ...doc.data()
-                    });
-                });
-
-                // Sort by date descending
-                globalOrders.sort((a, b) => {
-                    const dateA = a.createdAt ? new Date(a.createdAt) : new Date(0);
-                    const dateB = b.createdAt ? new Date(b.createdAt) : new Date(0);
-                    return dateB - dateA;
-                });
-
-                renderDashboard();
-                document.getElementById('loadingOverlay').classList.add('hidden');
-            }, (err) => {
-                console.error("onSnapshot failed:", err);
-            });
-        }
-
-        // 5. TABS MANAGER SYSTEM
+        // ------------------------------------------------------------
+        // TAB SWITCH CONTROLLER - HIDES STATS SECTION ON MENU TAB
+        // ------------------------------------------------------------
         function switchTab(tab) {
             currentTab = tab;
             
-            // Adjust button visuals
-            document.getElementById('tabOrders').className = (tab === 'orders') 
-                ? "px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]"
-                : "px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
+            // Buttons visual update
+            document.getElementById('tabOrders').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'orders' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
+            document.getElementById('tabHistory').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'history' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
+            document.getElementById('tabMenu').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'menu' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
 
-            document.getElementById('tabHistory').className = (tab === 'history')
-                ? "px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]"
-                : "px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
-
-            document.getElementById('tabMenu').className = (tab === 'menu')
-                ? "px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850]"
-                : "px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white";
-
-            // Hide/Show contents
+            // Panes show/hide
             document.getElementById('tabOrdersContent').classList.toggle('hidden', tab !== 'orders');
             document.getElementById('tabHistoryContent').classList.toggle('hidden', tab !== 'history');
             document.getElementById('tabMenuContent').classList.toggle('hidden', tab !== 'menu');
 
-            // Set up labels based on tabs
-            const salesCardLabel = document.getElementById('salesCardLabel');
-            const salesCardSub = document.getElementById('salesCardSub');
-            const customersCardLabel = document.getElementById('customersCardLabel');
-            const customersCardSub = document.getElementById('customersCardSub');
-            const pendingCardLabel = document.getElementById('pendingCardLabel');
-            const pendingCardSub = document.getElementById('pendingCardSub');
-
-            if (tab === 'orders') {
-                salesCardLabel.innerText = "Jualan Hari Ini (Paid)";
-                salesCardSub.innerText = "Berdasarkan pesanan berbayar sahaja hari ini";
-                customersCardLabel.innerText = "Pelanggan Hari Ini";
-                customersCardSub.innerText = "1 resit pesanan = 1 pelanggan hari ini";
-                pendingCardLabel.innerText = "Kutipan Tertunggak (Unpaid)";
-                pendingCardSub.innerText = "Jumlah amaun dari meja yang belum bayar";
+            // HIDE/SHOW STATS CONTAINER FOR MENU TAB AS REQUESTED
+            const statsSection = document.getElementById('statsSection');
+            if (tab === 'menu') {
+                statsSection.classList.add('hidden');
             } else {
-                salesCardLabel.innerText = "Jumlah Jualan (Semua Order)";
-                salesCardSub.innerText = "Jumlah jualan bersih terkumpul sepanjang masa";
-                customersCardLabel.innerText = "Jumlah Pelanggan";
-                customersCardSub.innerText = "Jumlah semua pesanan/resit yang pernah dibuat";
-                pendingCardLabel.innerText = "Jumlah Tertunggak Keseluruhan";
-                pendingCardSub.innerText = "Jumlah amaun uncollected sepanjang masa";
+                statsSection.classList.remove('hidden');
             }
 
             renderDashboard();
-
-            // Load menu database if active tab
-            if (tab === 'menu') {
-                fetchSupabaseMenus();
-            }
         }
 
         function setFilter(type) {
             filterType = type;
+            document.getElementById('filterUnpaid').className = "px-4 py-1.5 text-xs font-bold rounded-md " + (type === 'unpaid' ? "bg-white text-navy shadow-sm" : "text-gray-600 hover:text-navy");
+            document.getElementById('filterPaid').className = "px-4 py-1.5 text-xs font-bold rounded-md " + (type === 'paid' ? "bg-white text-navy shadow-sm" : "text-gray-600 hover:text-navy");
             
-            document.querySelectorAll('[id^="filter"]').forEach(btn => {
-                btn.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-gray-500 hover:text-navy";
-            });
-
-            const targetBtn = document.getElementById(type === 'unpaid' ? 'filterUnpaid' : 'filterPaid');
-            if (targetBtn) {
-                targetBtn.className = "px-4 py-1.5 text-xs font-bold rounded-lg transition-all text-navy bg-amber-500/10 border border-[#c5a850]/20";
-            }
-
             renderDashboard();
         }
 
-        // 6. RENDER DASHBOARD METRICS
+        // Reset History Date Filter Input
+        function clearHistoryDateFilter() {
+            const dateInput = document.getElementById('historyDateFilter');
+            if (dateInput) {
+                dateInput.value = '';
+            }
+            renderDashboard();
+        }
+
+        // ------------------------------------------------------------
+        // RENDER CORE METRICS & LIVE DATA
+        // ------------------------------------------------------------
         function renderDashboard() {
+            if (currentTab === 'menu') return; // Do not recalculate dashboard stats while in Menu Editor
+
+            const liveOrdersGrid = document.getElementById('liveOrdersContainer');
+            const noOrdersNotice = document.getElementById('noLiveOrders');
+            const historyTableBody = document.getElementById('historyTableBody');
+            const noHistoryData = document.getElementById('noHistoryData');
+
             const textTodaySales = document.getElementById('todaySales');
             const textTodayCustomers = document.getElementById('todayCustomers');
             const textPendingPayments = document.getElementById('pendingPayments');
 
+            const labelSalesCard = document.getElementById('labelSalesCard');
+            const labelCustomerCard = document.getElementById('labelCustomerCard');
+            const labelPendingCard = document.getElementById('labelPendingCard');
+
             const todayStr = new Date().toDateString();
 
-            if (currentTab === 'history') {
-                let globalSalesSum = 0;
-                let globalPendingSum = 0;
-                let globalPaidReceipts = 0;
+            // Read chosen date filter if any
+            const dateFilterInput = document.getElementById('historyDateFilter');
+            const dateFilterVal = dateFilterInput ? dateFilterInput.value : ''; // "YYYY-MM-DD" style
 
-                globalOrders.forEach(order => {
-                    const isPaid = (order.paymentStatus === 'Paid');
-                    const orderTotal = Number(order.totalPrice) || 0;
+            // 1. STATS METRIC LABELS SELECTION
+            if (currentTab === 'orders') {
+                // Today's metrics only
+                labelSalesCard.innerText = "Kutipan Hari Ini";
+                labelCustomerCard.innerText = "Pelanggan Hari Ini";
+                labelPendingCard.innerText = "Menunggu Bayaran (Hari Ini)";
 
-                    if (isPaid) {
-                        globalSalesSum += orderTotal;
-                        globalPaidReceipts++; 
+                const todayOrders = globalOrders.filter(order => order.createdAt && new Date(order.createdAt).toDateString() === todayStr);
+                
+                let salesSum = 0;
+                let unpaidSum = 0;
+                let customerCount = 0;
+
+                todayOrders.forEach(o => {
+                    const price = Number(o.totalPrice) || 0;
+                    if (o.paymentStatus === 'Paid') {
+                        salesSum += price;
+                        customerCount++;
                     } else {
-                        globalPendingSum += orderTotal;
+                        unpaidSum += price;
                     }
                 });
 
-                textTodaySales.innerText = `RM ${globalSalesSum.toFixed(2)}`;
-                textTodayCustomers.innerText = `${globalPaidReceipts} Resit`;
-                textPendingPayments.innerText = `RM ${globalPendingSum.toFixed(2)}`;
+                textTodaySales.innerText = `RM ${salesSum.toFixed(2)}`;
+                textTodayCustomers.innerText = `${customerCount} Orang`;
+                textPendingPayments.innerText = `RM ${unpaidSum.toFixed(2)}`;
 
-                renderHistoryTab();
-                return;
-            }
-
-            // Metrik Hari Ini Sahaja
-            let todaySalesSum = 0;
-            let todayPendingSum = 0;
-            let todayPaidReceipts = 0;
-
-            globalOrders.forEach(order => {
-                const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
-                const isPaid = (order.paymentStatus === 'Paid');
-                const orderTotal = Number(order.totalPrice) || 0;
-
-                if (orderDate === todayStr) {
-                    if (isPaid) {
-                        todaySalesSum += orderTotal;
-                        todayPaidReceipts++; 
-                    } else {
-                        todayPendingSum += orderTotal;
-                    }
+            } else if (currentTab === 'history') {
+                // If date is selected, metrics show chosen date stats. Otherwise, Cumulative All-Time Metrics
+                if (dateFilterVal) {
+                    const formattedDateStr = new Date(dateFilterVal).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+                    labelSalesCard.innerText = `Kutipan (${formattedDateStr})`;
+                    labelCustomerCard.innerText = `Pelanggan (${formattedDateStr})`;
+                    labelPendingCard.innerText = `Belum Dikutip (${formattedDateStr})`;
+                } else {
+                    labelSalesCard.innerText = "Jumlah Jualan (Keseluruhan)";
+                    labelCustomerCard.innerText = "Jumlah Pelanggan (Keseluruhan)";
+                    labelPendingCard.innerText = "Jumlah Belum Dikutip (Keseluruhan)";
                 }
-            });
 
-            textTodaySales.innerText = `RM ${todaySalesSum.toFixed(2)}`;
-            textTodayCustomers.innerText = `${todayPaidReceipts} Resit`;
-            textPendingPayments.innerText = `RM ${todayPendingSum.toFixed(2)}`;
+                let salesSum = 0;
+                let unpaidSum = 0;
+                let customerCount = 0;
 
-            if (currentTab === 'menu') return;
+                globalOrders.forEach(o => {
+                    // Check if date filter matches
+                    if (dateFilterVal && o.createdAt) {
+                        const oDate = new Date(o.createdAt);
+                        const oYear = oDate.getFullYear();
+                        const oMonth = String(oDate.getMonth() + 1).padStart(2, '0');
+                        const oDay = String(oDate.getDate()).padStart(2, '0');
+                        const oDateString = `${oYear}-${oMonth}-${oDay}`;
+                        if (oDateString !== dateFilterVal) return; // Skip if no match
+                    }
 
-            const liveContainer = document.getElementById('liveOrdersContainer');
-            const noOrdersNotice = document.getElementById('noLiveOrders');
+                    const price = Number(o.totalPrice) || 0;
+                    if (o.paymentStatus === 'Paid') {
+                        salesSum += price;
+                        customerCount++;
+                    } else {
+                        unpaidSum += price;
+                    }
+                });
 
-            // Syarat Ketat: Hanya pesanan bertarikh HARI INI sahaja dipaparkan pada tab Pesanan Aktif.
-            let listToDisplay = globalOrders.filter(order => {
-                const orderDate = order.createdAt ? new Date(order.createdAt).toDateString() : '';
-                return orderDate === todayStr;
-            });
-
-            if (filterType === 'unpaid') {
-                listToDisplay = listToDisplay.filter(o => o.paymentStatus !== 'Paid');
-            } else if (filterType === 'paid') {
-                listToDisplay = listToDisplay.filter(o => o.paymentStatus === 'Paid');
+                textTodaySales.innerText = `RM ${salesSum.toFixed(2)}`;
+                textTodayCustomers.innerText = `${customerCount} Orang`;
+                textPendingPayments.innerText = `RM ${unpaidSum.toFixed(2)}`;
             }
 
-            if (listToDisplay.length === 0) {
-                noOrdersNotice.classList.remove('hidden');
-                liveContainer.classList.add('hidden');
-                return;
-            }
+            // 2. RENDERING ACTIVE ORDERS PANEL
+            if (currentTab === 'orders') {
+                // Display strictly orders of today
+                let activeList = globalOrders.filter(order => order.createdAt && new Date(order.createdAt).toDateString() === todayStr);
+                
+                // Filter status criteria
+                activeList = activeList.filter(order => {
+                    const status = order.paymentStatus || 'Unpaid';
+                    return filterType === 'paid' ? status === 'Paid' : status === 'Unpaid';
+                });
 
-            noOrdersNotice.classList.add('hidden');
-            liveContainer.classList.remove('hidden');
-            liveContainer.innerHTML = '';
+                if (activeList.length === 0) {
+                    noOrdersNotice.classList.remove('hidden');
+                    liveOrdersGrid.classList.add('hidden');
+                } else {
+                    noOrdersNotice.classList.add('hidden');
+                    liveOrdersGrid.classList.remove('hidden');
+                    liveOrdersGrid.innerHTML = '';
 
-            listToDisplay.forEach(order => {
-                const isPaid = (order.paymentStatus === 'Paid');
-                const orderTotal = Number(order.totalPrice) || 0;
-                const receiptId = order.receiptId || order.id || 'WI-UNKNOWN';
+                    activeList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).forEach(order => {
+                        const card = document.createElement('div');
+                        const isPaid = order.paymentStatus === 'Paid';
+                        card.className = "p-5 rounded-2xl border bg-white shadow-sm flex flex-col justify-between border-gray-100 hover:shadow-md transition-all";
+                        
+                        // Constructing nested order items list
+                        let itemsHtml = '';
+                        const items = Array.isArray(order.items) ? order.items : [];
+                        items.forEach((it, idx) => {
+                            itemsHtml += `
+                                <div class="flex justify-between items-center text-xs py-1 border-b border-gray-100 last:border-0 last:pb-0">
+                                    <span class="text-gray-800 pr-2">
+                                        <span class="font-bold text-navy">${it.quantity || 1}x</span> ${it.name || 'Sajian'}
+                                    </span>
+                                    <div class="flex items-center gap-2">
+                                        <span class="font-semibold text-gray-500">RM ${((it.price || 0) * (it.quantity || 1)).toFixed(2)}</span>
+                                        <!-- Trash button to cancel specifically one item from an order -->
+                                        <button onclick="removeItemFromOrder('${order.id}', ${idx})" class="text-red-500 hover:text-red-700 p-0.5" title="Batal Menu Ini">
+                                            <i class="fa-regular fa-trash-can text-[11px]"></i>
+                                        </button>
+                                    </div>
+                                </div>
+                            `;
+                        });
 
-                let itemsListHtml = '';
-                const items = Array.isArray(order.items) ? order.items : [];
-                items.forEach(it => {
-                    itemsListHtml += `
-                        <div class="flex justify-between items-center text-xs py-1.5 border-b border-gray-100 last:border-0 text-gray-700">
-                            <span><span class="font-bold text-navy">${it.quantity}x</span> ${it.name}</span>
-                            <div class="flex items-center gap-2.5">
-                                <span class="font-semibold text-gray-900">RM ${(it.price * it.quantity).toFixed(2)}</span>
-                                <button onclick="removeItemFromOrder('${order.id}', '${it.name}')" class="text-rose-500 hover:text-rose-700 transition duration-150 p-1" title="Buang Sajian Ini">
-                                    <i class="fa-solid fa-trash-can"></i>
-                                </button>
+                        const orderDate = order.createdAt ? new Date(order.createdAt) : new Date();
+                        const timeString = orderDate.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                        const dateString = orderDate.toLocaleDateString('ms-MY', { weekday: 'short', day: 'numeric', month: 'short', year: 'numeric' });
+
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-start mb-3">
+                                    <div>
+                                        <span class="text-xs bg-navy text-white px-3 py-1 rounded-full font-bold">MEJA ${order.tableNumber || '?'}</span>
+                                        <span class="block text-[10px] font-mono font-bold text-gray-400 mt-1">${order.receiptId || order.id}</span>
+                                    </div>
+                                    <div class="text-right">
+                                        <span class="text-[10px] text-gray-500 font-bold block">${dateString}</span>
+                                        <span class="text-[10px] text-[#c5a850] font-bold block">${timeString}</span>
+                                    </div>
+                                </div>
+
+                                <div class="space-y-1 my-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
+                                    ${itemsHtml}
+                                </div>
                             </div>
-                        </div>
-                    `;
-                });
 
-                if (items.length === 0) {
-                    itemsListHtml = `<div class="text-[11px] text-gray-400 italic py-1">Tiada butiran sajian dihantar.</div>`;
+                            <div>
+                                <div class="flex justify-between items-center py-2 border-t border-gray-100 mb-3">
+                                    <span class="text-xs font-semibold text-gray-500">Jumlah Kasar:</span>
+                                    <span class="text-lg font-serif-elegant font-bold text-navy">RM ${Number(order.totalPrice || 0).toFixed(2)}</span>
+                                </div>
+                                <div class="flex gap-2">
+                                    <!-- Toggle status PAID/UNPAID -->
+                                    <button onclick="togglePaymentStatus('${order.id}', '${isPaid ? 'Unpaid' : 'Paid'}')" 
+                                        class="flex-1 py-2 rounded-lg text-xs font-bold uppercase transition ${isPaid ? 'bg-amber-100 hover:bg-amber-200 text-[#111e29]' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'}">
+                                        ${isPaid ? 'Tukar UNPAID' : 'PAID'}
+                                    </button>
+                                    <button onclick="confirmDeleteOrder('${order.id}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs transition" title="Batal Keseluruhan Pesanan">
+                                        <i class="fa-solid fa-trash-can"></i>
+                                    </button>
+                                </div>
+                            </div>
+                        `;
+                        liveOrdersGrid.appendChild(card);
+                    });
+                }
+            }
+
+            // 3. RENDERING HISTORY RECORDS
+            if (currentTab === 'history') {
+                // Filter the history list based on the date selection
+                let historyList = [...globalOrders];
+                if (dateFilterVal) {
+                    historyList = historyList.filter(order => {
+                        if (!order.createdAt) return false;
+                        const oDate = new Date(order.createdAt);
+                        const oYear = oDate.getFullYear();
+                        const oMonth = String(oDate.getMonth() + 1).padStart(2, '0');
+                        const oDay = String(oDate.getDate()).padStart(2, '0');
+                        const oDateString = `${oYear}-${oMonth}-${oDay}`;
+                        return oDateString === dateFilterVal;
+                    });
                 }
 
-                const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
-                const daysInMalay = ["Ahad", "Isnin", "Selasa", "Rabu", "Khamis", "Jumaat", "Sabtu"];
-                const monthsInMalay = ["Jan", "Feb", "Mac", "Apr", "Mei", "Jun", "Jul", "Ogo", "Sep", "Okt", "Nov", "Dis"];
-                
-                const dayStr = daysInMalay[dateObj.getDay()];
-                const dateNum = dateObj.getDate();
-                const monthStr = monthsInMalay[dateObj.getMonth()];
-                const yearNum = dateObj.getFullYear();
-                const displayTimeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit', hour12: true }).toUpperCase();
-                const displayFullWrittenDate = `${dayStr}, ${dateNum} ${monthStr} ${yearNum}`;
-
-                const card = document.createElement('div');
-                card.className = `p-5 rounded-2xl border transition-all duration-300 ${isPaid ? 'bg-white/70 border-gray-100 opacity-75' : 'bg-white border-[#c5a850]/40 shadow-md hover:shadow-lg'}`;
-
-                card.innerHTML = `
-                    <div class="flex justify-between items-start mb-4">
-                        <div>
-                            <span class="text-xs bg-navy text-white font-bold px-3 py-1 rounded-lg">MEJA ${order.tableNumber || '?'}</span>
-                            <span class="text-[10px] font-mono block mt-1.5 font-bold text-gray-400">${receiptId}</span>
-                        </div>
-                        <div class="text-right">
-                            <span class="text-[11px] text-navy font-extrabold block"><i class="fa-regular fa-calendar-check mr-1 text-[#c5a850]"></i>${displayFullWrittenDate}</span>
-                            <span class="text-[11px] text-amber-600 font-extrabold block"><i class="fa-regular fa-clock mr-1"></i>${displayTimeStr}</span>
-                            <span class="inline-block mt-2 text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800 animate-pulse'}">
-                                ${order.paymentStatus || 'Unpaid'}
-                            </span>
-                        </div>
-                    </div>
-
-                    <div class="space-y-1 mb-4 bg-gray-50/70 p-3 rounded-xl border border-gray-100">
-                        <p class="text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Butiran Pesanan</p>
-                        ${itemsListHtml}
-                    </div>
-
-                    <div class="flex justify-between items-center mb-4 pt-1 border-t border-gray-50">
-                        <span class="text-xs font-bold text-gray-500">Jumlah Kasar:</span>
-                        <span class="text-lg font-serif-elegant font-bold text-emerald-800">RM ${orderTotal.toFixed(2)}</span>
-                    </div>
-
-                    <div class="pt-2 flex flex-col gap-2">
-                        ${isPaid ? `
-                            <button onclick="togglePaymentStatus('${order.id}', 'Unpaid')" class="w-full py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition-all flex items-center justify-center gap-1.5 border border-gray-200 shadow-sm">
-                                <i class="fa-solid fa-rotate-left"></i>Tukar Kepada Unpaid
-                            </button>
-                        ` : `
-                            <button onclick="togglePaymentStatus('${order.id}', 'Paid')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white rounded-xl text-xs font-extrabold transition-all flex items-center justify-center gap-1.5 shadow-md">
-                                PAID
-                            </button>
-                        `}
-                        <button onclick="confirmDeleteOrder('${order.id}')" class="w-full py-2 bg-rose-50 hover:bg-rose-100 text-rose-700 rounded-xl text-xs font-semibold transition-all flex items-center justify-center gap-1.5 border border-rose-200">
-                            <i class="fa-solid fa-trash-can"></i> Batal Pesanan
-                        </button>
-                    </div>
-                `;
-                liveContainer.appendChild(card);
-            });
-        }
-
-        // 7. FIREBASE HELPERS & MODIFICATIONS
-        async function removeItemFromOrder(orderId, itemName) {
-            const order = globalOrders.find(o => o.id === orderId);
-            if (!order) return;
-
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300";
-            modal.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-rose-600"></div>
-                    <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-rose-500/10 text-rose-500">
-                        <i class="fa-solid fa-circle-exclamation text-2xl animate-pulse"></i>
-                    </div>
-                    <h3 class="text-xl font-classic font-bold text-navy mb-2">Buang Hidangan?</h3>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Adakah anda pasti mahu membuang sajian <span class="font-bold text-gray-800">${itemName}</span> daripada pesanan ini?</p>
-                    <div class="flex gap-3">
-                        <button id="cancelItemModalBtn" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">Kembali</button>
-                        <button id="confirmItemModalBtn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-200">Ya, Buang</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-
-            modal.querySelector('#cancelItemModalBtn').onclick = () => modal.remove();
-            modal.querySelector('#confirmItemModalBtn').onclick = async () => {
-                modal.remove();
-                
-                const updatedItems = order.items.filter(item => item.name !== itemName);
-                const updatedTotal = updatedItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
-
-                if (db) {
-                    try {
-                        if (updatedItems.length === 0) {
-                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).delete();
-                        } else {
-                            await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).update({
-                                items: updatedItems,
-                                totalPrice: updatedTotal
-                            });
-                        }
-                    } catch (error) {
-                        console.error("Gagal mengemaskini item: ", error);
-                        alertCustom("Masalah sambungan dikesan semasa membuang menu.");
+                // Update sub-label of the panel
+                const countLabel = document.getElementById('filteredCountLabel');
+                if (countLabel) {
+                    if (dateFilterVal) {
+                        const formattedDateStr = new Date(dateFilterVal).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+                        countLabel.innerText = `Menunjukkan ${historyList.length} pesanan pada tarikh ${formattedDateStr}`;
+                    } else {
+                        countLabel.innerText = `Menunjukkan semua ${historyList.length} pesanan keseluruhan`;
                     }
                 }
-            };
-        }
 
-        function confirmDeleteOrder(orderId) {
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300";
-            modal.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-rose-600"></div>
-                    <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-rose-500/10 text-rose-500">
-                        <i class="fa-solid fa-trash-can text-2xl animate-bounce"></i>
-                    </div>
-                    <h3 class="text-xl font-classic font-bold text-navy mb-2">Batal Pesanan?</h3>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Adakah anda pasti mahu membatalkan atau memadam keseluruhan pesanan ini secara kekal?</p>
-                    <div class="flex gap-3">
-                        <button id="cancelModalBtn" class="flex-1 py-3 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">Kembali</button>
-                        <button id="confirmModalBtn" class="flex-1 py-3 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-200">Ya, Batal</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
-            
-            modal.querySelector('#cancelModalBtn').onclick = () => modal.remove();
-            modal.querySelector('#confirmModalBtn').onclick = async () => {
-                modal.remove();
-                if (db) {
-                    try {
-                        await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).delete();
-                    } catch (error) {
-                        console.error("Gagal memadam pesanan: ", error);
-                        alertCustom("Masalah sambungan dikesan.");
-                    }
+                if (historyList.length === 0) {
+                    noHistoryData.classList.remove('hidden');
+                    historyTableBody.parentElement.parentElement.classList.add('hidden');
+                } else {
+                    noHistoryData.classList.add('hidden');
+                    historyTableBody.parentElement.parentElement.classList.remove('hidden');
+                    historyTableBody.innerHTML = '';
+
+                    historyList.sort((a, b) => new Date(b.createdAt || 0) - new Date(a.createdAt || 0)).forEach(order => {
+                        const orderDate = order.createdAt ? new Date(order.createdAt) : new Date();
+                        const dateString = orderDate.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+                        const timeString = orderDate.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
+                        const isPaid = order.paymentStatus === 'Paid';
+
+                        const tr = document.createElement('tr');
+                        tr.className = "hover:bg-slate-50 transition-colors border-b border-gray-100 last:border-0";
+                        tr.innerHTML = `
+                            <td class="p-4 font-semibold text-gray-800">${dateString} <span class="text-gray-400 font-normal ml-1">${timeString}</span></td>
+                            <td class="p-4 font-mono font-bold text-gray-400">${order.receiptId || order.id}</td>
+                            <td class="p-4"><span class="bg-gray-100 text-navy px-2.5 py-1 rounded text-xs font-bold">Meja ${order.tableNumber || '?'}</span></td>
+                            <td class="p-4 font-serif-elegant font-bold text-navy text-sm">RM ${Number(order.totalPrice || 0).toFixed(2)}</td>
+                            <td class="p-4">
+                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                    ${order.paymentStatus || 'Unpaid'}
+                                </span>
+                            </td>
+                            <td class="p-4">
+                                <button onclick="downloadReceiptPDF('${order.id}')" class="px-3 py-1 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-[10px] font-bold rounded-lg uppercase tracking-wider transition">
+                                    <i class="fa-solid fa-file-pdf mr-1"></i> Resit PDF
+                                </button>
+                            </td>
+                        `;
+                        historyTableBody.appendChild(tr);
+                    });
                 }
-            };
+            }
         }
 
-        async function togglePaymentStatus(orderId, newStatus) {
+        // ------------------------------------------------------------
+        // UPDATE TRANSACTION OR PAYMENT STATUS
+        // ------------------------------------------------------------
+        async function togglePaymentStatus(orderDocId, newStatus) {
             if (!db) return;
             try {
-                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).update({
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderDocId).update({
                     paymentStatus: newStatus
                 });
-            } catch (err) {
-                console.error("Error updating status:", err);
+            } catch(e) {
+                console.error("Failed to update payment status:", e);
+                alertCustom("Ralat mengemaskini status bayaran.");
             }
         }
 
-        function renderHistoryTab() {
-            const tableBody = document.getElementById('historyTableBody');
-            const noData = document.getElementById('noHistoryData');
+        // ------------------------------------------------------------
+        // REMOVE/CANCEL INDIVIDUAL ITEM FROM ACTIVE MEALS LIST
+        // ------------------------------------------------------------
+        async function removeItemFromOrder(orderDocId, itemIndex) {
+            if (!confirm("Adakah anda pasti untuk membuang menu hidangan ini daripada senarai pesanan?")) return;
 
-            if (globalOrders.length === 0) {
-                noData.classList.remove('hidden');
-                tableBody.innerHTML = '';
-                return;
-            }
-
-            noData.classList.add('hidden');
-            tableBody.innerHTML = '';
-
-            globalOrders.forEach(order => {
-                const paymentStatus = order.paymentStatus || 'Unpaid';
-                const isPaid = (paymentStatus === 'Paid');
-                const orderTotal = Number(order.totalPrice) || 0;
-                const receiptId = order.receiptId || order.id || 'WI-UNKNOWN';
-
-                const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
-                const dateStr = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-                const timeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-
-                const tr = document.createElement('tr');
-                tr.className = "hover:bg-slate-50 transition-colors";
-                tr.innerHTML = `
-                    <td class="p-4 font-bold text-gray-900 font-mono">${receiptId}</td>
-                    <td class="p-4 text-gray-700 font-semibold">Meja ${order.tableNumber || '?'}</td>
-                    <td class="p-4 text-gray-600">${dateStr} &bull; ${timeStr}</td>
-                    <td class="p-4 text-emerald-700 font-bold">RM ${orderTotal.toFixed(2)}</td>
-                    <td class="p-4">
-                        <span class="inline-block text-[10px] font-bold uppercase px-2 py-0.5 rounded ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                            ${paymentStatus}
-                        </span>
-                    </td>
-                    <td class="p-4 text-center">
-                        <button onclick="downloadReceiptPDF('${order.id}')" class="px-3 py-1.5 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-[10px] font-bold rounded-lg uppercase tracking-wide transition flex items-center justify-center gap-1.5 mx-auto shadow-sm">
-                            <i class="fa-solid fa-file-pdf"></i> PDF Resit
-                        </button>
-                    </td>
-                `;
-                tableBody.appendChild(tr);
-            });
-        }
-
-        // 8. PDF GENERATOR SYSTEM (A6 THERMAL PRINT FORMAT)
-        function downloadReceiptPDF(orderId) {
-            const order = globalOrders.find(o => o.id === orderId);
+            const order = globalOrders.find(o => o.id === orderDocId);
             if (!order) return;
-            
+
+            let updatedItems = [...order.items];
+            updatedItems.splice(itemIndex, 1);
+
+            // Re-calculate the grand total amount
+            const newTotal = updatedItems.reduce((sum, item) => sum + (Number(item.price) * Number(item.quantity)), 0);
+
+            try {
+                if (updatedItems.length === 0) {
+                    // If no items are left, delete the entire order safely
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderDocId).delete();
+                } else {
+                    await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderDocId).update({
+                        items: updatedItems,
+                        totalPrice: newTotal
+                    });
+                }
+                console.log("Item removed and price recalculated successfully.");
+            } catch (err) {
+                console.error("Failed to remove menu item: ", err);
+                alertCustom("Ralat memadam hidangan spesifik.");
+            }
+        }
+
+        // ------------------------------------------------------------
+        // CANCEL ENTIRE BILL ORDER
+        // ------------------------------------------------------------
+        async function confirmDeleteOrder(orderDocId) {
+            if (!confirm("Adakah anda pasti untuk membatalkan dan memadam keseluruhan pesanan meja ini?")) return;
+
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderDocId).delete();
+                console.log("Entire order deleted.");
+            } catch (err) {
+                console.error("Failed to delete order document: ", err);
+                alertCustom("Ralat membatalkan pesanan.");
+            }
+        }
+
+        // ------------------------------------------------------------
+        // DOWNLOAD THERMAL-STYLE RECEIPT PDF
+        // ------------------------------------------------------------
+        function downloadReceiptPDF(orderDocId) {
+            const order = globalOrders.find(o => o.id === orderDocId);
+            if (!order) return;
+
             const { jsPDF } = window.jspdf;
             const doc = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
-                format: 'a6'
+                format: [80, 150] // Standard A6/Thermal width layout style
             });
 
-            doc.setFont("Helvetica", "bold");
+            // Clean Header Styles
+            doc.setFont('Helvetica', 'bold');
             doc.setFontSize(14);
-            doc.setTextColor(17, 30, 41);
-            doc.text("WARUNG IBU", 52, 15, { align: "center" });
+            doc.text("WARUNG IBU", 40, 15, { align: 'center' });
             
-            doc.setFont("Helvetica", "italic");
-            doc.setFontSize(8);
-            doc.setTextColor(197, 168, 80);
-            doc.text('"Air tangan ibu sentiasa terbaik"', 52, 20, { align: "center" });
+            doc.setFontSize(7);
+            doc.setFont('Helvetica', 'normal');
+            doc.text("Air tangan ibu sentiasa terbaik", 40, 19, { align: 'center' });
+            doc.text("Kuala Lumpur, Malaysia", 40, 22, { align: 'center' });
             
-            doc.setDrawColor(197, 168, 80);
-            doc.setLineWidth(0.4);
-            doc.line(10, 24, 95, 24);
-            
-            doc.setFont("Helvetica", "normal");
-            doc.setTextColor(44, 37, 32);
-            doc.setFontSize(8);
-            
-            const dateObj = order.createdAt ? new Date(order.createdAt) : new Date();
-            const dateStr = dateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
-            const timeStr = dateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
-            
-            doc.text(`ID Resit: ${order.receiptId || order.id}`, 10, 31);
-            doc.text(`Meja: ${order.tableNumber || '?'}`, 10, 36);
-            doc.text(`Masa: ${dateStr} ${timeStr}`, 10, 41);
-            doc.text(`Status: ${order.paymentStatus || 'Unpaid'}`, 10, 46);
-            
-            doc.line(10, 50, 95, 50);
-            
-            doc.setFont("Helvetica", "bold");
-            doc.text("Sajian", 10, 55);
-            doc.text("Kuan", 65, 55);
-            doc.text("Jumlah", 80, 55);
-            doc.line(10, 57, 95, 57);
-            
-            doc.setFont("Helvetica", "normal");
-            let y = 62;
+            doc.line(10, 25, 70, 25);
+
+            // Receipt Metadata details
+            doc.setFont('Helvetica', 'bold');
+            doc.text(`MEJA: ${order.tableNumber || '?'}`, 10, 30);
+            doc.setFont('Helvetica', 'normal');
+            doc.text(`ID Resit: ${order.receiptId || order.id}`, 10, 34);
+            doc.text(`Tarikh: ${new Date(order.createdAt).toLocaleDateString('ms-MY')}`, 10, 38);
+            doc.text(`Masa: ${new Date(order.createdAt).toLocaleTimeString('ms-MY')}`, 10, 42);
+
+            doc.line(10, 45, 70, 45);
+
+            // Items breakdown
+            let y = 50;
+            doc.setFont('Helvetica', 'bold');
+            doc.text("Sajian", 10, y);
+            doc.text("Kuantiti", 45, y, { align: 'center' });
+            doc.text("Harga", 70, y, { align: 'right' });
+            y += 4;
+            doc.line(10, y - 2, 70, y - 2);
+
+            doc.setFont('Helvetica', 'normal');
             const items = Array.isArray(order.items) ? order.items : [];
-            items.forEach(item => {
-                let name = item.name || '';
-                if (name.length > 25) name = name.substring(0, 22) + '...';
-                
-                doc.text(name, 10, y);
-                doc.text(`${item.quantity}x`, 67, y);
-                doc.text(`RM ${(item.price * item.quantity).toFixed(2)}`, 80, y);
+            items.forEach(it => {
+                doc.text(it.name.substring(0, 22), 10, y);
+                doc.text(`${it.quantity}x`, 45, y, { align: 'center' });
+                doc.text(`RM ${((it.price || 0) * (it.quantity || 1)).toFixed(2)}`, 70, y, { align: 'right' });
                 y += 5;
             });
+
+            doc.line(10, y - 2, 70, y - 2);
+            y += 3;
+
+            // Total price representation
+            doc.setFont('Helvetica', 'bold');
+            doc.text("Jumlah Kasar:", 10, y);
+            doc.text(`RM ${Number(order.totalPrice).toFixed(2)}`, 70, y, { align: 'right' });
             
-            doc.line(10, y, 95, y);
             y += 6;
-            
-            doc.setFont("Helvetica", "bold");
-            doc.setFontSize(10);
-            doc.text("JUMLAH BIL:", 10, y);
-            doc.text(`RM ${Number(order.totalPrice || 0).toFixed(2)}`, 80, y);
-            
+            doc.setFont('Helvetica', 'bold');
+            doc.text(`STATUS: ${order.paymentStatus || 'Unpaid'}`, 10, y);
+
             y += 8;
-            doc.setFont("Helvetica", "italic");
-            doc.setFontSize(7);
-            doc.setTextColor(120, 120, 120);
-            doc.text("Resipi warisan sejak 1982. Terima kasih!", 52, y, { align: "center" });
-            
-            doc.save(`Resit_WarungIbu_${order.receiptId || order.id}.pdf`);
+            doc.setFont('Helvetica', 'italic');
+            doc.setFontSize(6);
+            doc.text("Terima kasih & Sila datang lagi!", 40, y, { align: 'center' });
+
+            // Trigger immediate local download
+            doc.save(`Resit_${order.receiptId || order.id}.pdf`);
         }
 
-        // 9. CLOUD DATABASE MENU OPERATIONS & UI RENDERING
-        async function fetchSupabaseMenus() {
-            if (!supabaseClient) return;
-
-            const grid = document.getElementById('supabaseMenuGrid');
-            const noMenuNotice = document.getElementById('noSupabaseMenu');
-            const counter = document.getElementById('supabaseCount');
+        // ------------------------------------------------------------
+        // URUS MENU: FETCH EXISTING MEALS FROM CLOUD
+        // ------------------------------------------------------------
+        async function fetchCloudMenus() {
+            if (!cloudClient) return;
 
             try {
-                const { data, error } = await supabaseClient
+                const { data, error } = await cloudClient
                     .from('list_menu')
                     .select('*')
                     .order('created_at', { ascending: false });
 
                 if (error) throw error;
 
-                counter.innerText = `${data.length} Sajian Berdaftar`;
+                globalMenus = data || [];
+                document.getElementById('cloudMenuCount').innerText = `${globalMenus.length} Sajian`;
 
-                if (data.length === 0) {
-                    noMenuNotice.classList.remove('hidden');
-                    grid.classList.add('hidden');
-                    return;
-                }
+                const tableBody = document.getElementById('cloudMenuTableBody');
+                tableBody.innerHTML = '';
 
-                noMenuNotice.classList.add('hidden');
-                grid.classList.remove('hidden');
-                grid.innerHTML = '';
-
-                data.forEach(item => {
-                    const card = document.createElement('div');
-                    card.className = "bg-white p-4 rounded-2xl border border-gray-100 shadow-sm flex gap-3 relative";
-                    card.innerHTML = `
-                        <img src="${item.image || 'https://placehold.co/100x100/eaeaea/999999?text=Tiada+Gambar'}" class="w-16 h-16 object-cover rounded-xl border border-gray-100 flex-shrink-0">
-                        <div class="flex-grow min-w-0 pr-12">
-                            <span class="text-[9px] font-bold uppercase tracking-wide px-2 py-0.5 rounded-full ${item.category === 'makanan' ? 'bg-amber-100 text-amber-800' : 'bg-blue-100 text-blue-800'}">${item.category}</span>
-                            <h5 class="text-xs font-bold text-navy mt-1.5 truncate">${item.name}</h5>
-                            <p class="text-xs font-bold text-emerald-800 mt-1">RM ${Number(item.price).toFixed(2)}</p>
-                        </div>
-                        <div class="absolute right-3 top-3 flex flex-col gap-1.5">
-                            <button onclick="editMenuRow('${item.id}', '${item.name.replace(/'/g, "\\'")}', '${item.category}', '${item.price}', '${item.description ? item.description.replace(/'/g, "\\'") : ''}', '${item.image || ''}', '${item.badge || ''}', '${item.badge_color || ''}')" class="p-1.5 bg-blue-50 text-blue-600 hover:bg-blue-100 rounded-lg text-[10px]" title="Edit"><i class="fa-solid fa-pen-to-square"></i></button>
-                            <button onclick="deleteMenuRow('${item.id}', '${item.image || ''}')" class="p-1.5 bg-rose-50 text-rose-600 hover:bg-rose-100 rounded-lg text-[10px]" title="Padam"><i class="fa-solid fa-trash-can"></i></button>
-                        </div>
+                globalMenus.forEach(item => {
+                    const tr = document.createElement('tr');
+                    tr.className = "hover:bg-slate-50 transition border-b border-gray-100 last:border-0";
+                    tr.innerHTML = `
+                        <td class="p-3">
+                            <div class="flex items-center gap-3">
+                                <img src="${getCleanImageUrl(item.image)}" alt="${item.name}" onerror="this.onerror=null; this.src='https://placehold.co/100x100/eaeaea/999999?text=Menu'" class="w-10 h-10 object-cover rounded-lg border border-gray-200">
+                                <div>
+                                    <span class="font-bold text-gray-800 block">${item.name}</span>
+                                    <span class="text-[9px] text-gray-400 block">${item.description ? item.description.substring(0, 30) + '...' : ''}</span>
+                                </div>
+                            </div>
+                        </td>
+                        <td class="p-3 capitalize font-semibold text-gray-500">${item.category || 'makanan'}</td>
+                        <td class="p-3 font-serif-elegant font-bold text-navy">RM ${Number(item.price).toFixed(2)}</td>
+                        <td class="p-3 text-right space-x-1.5">
+                            <button onclick="editMenuForm('${item.id}')" class="p-1.5 text-blue-600 hover:text-blue-800" title="Kemas Kini"><i class="fa-solid fa-pen-to-square"></i></button>
+                            <button onclick="deleteMenuFromCloud('${item.id}', '${item.image}')" class="p-1.5 text-red-500 hover:text-red-700" title="Padam"><i class="fa-solid fa-trash"></i></button>
+                        </td>
                     `;
-                    grid.appendChild(card);
+                    tableBody.appendChild(tr);
                 });
 
             } catch (err) {
-                console.error("Gagal mendapatkan menu:", err);
-                alertCustom("Ralat Sistem: Gagal memuat turun senarai menu semasa.");
+                console.error("Failed to read menu from cloud table: ", err);
             }
         }
 
-        // Image Selection Preview
-        function previewSelectedImage(event) {
-            const file = event.target.files[0];
-            if (!file) return;
-
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                document.getElementById('imagePreview').src = e.target.result;
-                document.getElementById('imagePreviewContainer').classList.remove('hidden');
-                document.getElementById('uploadIcon').className = "fa-solid fa-circle-check text-emerald-500 text-lg mb-1";
-                document.getElementById('uploadText').innerText = file.name;
-            };
-            reader.readAsDataURL(file);
+        // Clean Image Url resolution for thumbnail display
+        function getCleanImageUrl(imagePath) {
+            if (!imagePath) return 'https://placehold.co/600x450/eaeaea/999999?text=Tiada+Gambar';
+            if (imagePath.startsWith('http://') || imagePath.startsWith('https://')) {
+                return imagePath;
+            }
+            return `${cloudDbUrl}/storage/v1/object/public/menu/${imagePath}`;
         }
 
-        function clearImagePreview() {
-            document.getElementById('menuImageFile').value = '';
-            document.getElementById('imagePreview').src = '';
-            document.getElementById('imagePreviewContainer').classList.add('hidden');
-            document.getElementById('uploadIcon').className = "fa-solid fa-cloud-arrow-up text-gray-400 text-lg mb-1";
-            document.getElementById('uploadText').innerText = "Klik untuk memuat naik fail";
+        // Preview local image selection in editor form
+        function previewSelectedImage(input) {
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('previewPlaceholder');
+            const fileNameSpan = document.getElementById('selectedFileName');
+
+            if (input.files && input.files[0]) {
+                const file = input.files[0];
+                fileNameSpan.innerText = file.name;
+
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    preview.src = e.target.result;
+                    preview.classList.remove('hidden');
+                    placeholder.classList.add('hidden');
+                }
+                reader.readAsDataURL(file);
+            } else {
+                preview.src = "";
+                preview.classList.add('hidden');
+                placeholder.classList.remove('hidden');
+                fileNameSpan.innerText = "Tiada gambar dipilih";
+            }
         }
 
-        // Handle Add & Edit Form Submit
-        async function handleMenuFormSubmit(event) {
-            event.preventDefault();
-            if (!supabaseClient) return;
-
-            const submitBtn = document.getElementById('btnSubmitMenu');
-            const originalText = submitBtn.innerText;
-            submitBtn.disabled = true;
-            submitBtn.innerHTML = `<i class="fa-solid fa-circle-notch animate-spin mr-2"></i> Memproses Menu...`;
-
-            const menuId = document.getElementById('menuId').value;
-            const name = document.getElementById('menuName').value;
+        // ------------------------------------------------------------
+        // URUS MENU: INSERT / UPDATE RECORDS INTO CLOUD STORAGE
+        // ------------------------------------------------------------
+        async function saveMenuToCloud() {
+            const menuId = document.getElementById('editMenuId').value;
+            const name = document.getElementById('menuName').value.trim();
             const category = document.getElementById('menuCategory').value;
             const price = parseFloat(document.getElementById('menuPrice').value);
-            const description = document.getElementById('menuDesc').value;
-            const badge = document.getElementById('menuBadge').value;
+            const description = document.getElementById('menuDescription').value.trim();
+            const badge = document.getElementById('menuBadge').value.trim();
             const badgeColor = document.getElementById('menuBadgeColor').value;
-            const imageFile = document.getElementById('menuImageFile').files[0];
+            const fileInput = document.getElementById('menuImageFile');
 
-            let imageUrl = '';
+            if (!name || !price || !description) {
+                alertCustom("Sila isi semua maklumat mandatori yang bertanda (*).");
+                return;
+            }
+
+            const saveBtn = document.getElementById('btnSaveMenu');
+            saveBtn.disabled = true;
+            saveBtn.innerHTML = `<i class="fa-solid fa-spinner animate-spin mr-1"></i> Menyimpan...`;
 
             try {
-                // 1. Upload File to Storage if file selected
-                if (imageFile) {
-                    const fileExt = imageFile.name.split('.').pop();
-                    const fileName = `${Date.now()}_menu_item.${fileExt}`;
-
-                    const { data: uploadData, error: uploadError } = await supabaseClient.storage
-                        .from('menu')
-                        .upload(fileName, imageFile);
-
-                    if (uploadError) throw uploadError;
-
-                    // Fetch Public URL of newly uploaded image
-                    const { data: publicData } = supabaseClient.storage
-                        .from('menu')
-                        .getPublicUrl(fileName);
-
-                    imageUrl = publicData.publicUrl;
-                } else if (menuId) {
-                    // Keeping previous image on edit if no new image is provided
-                    const oldImgSrc = document.getElementById('imagePreview').src;
-                    if (oldImgSrc && !oldImgSrc.startsWith('data:')) {
-                        imageUrl = oldImgSrc;
-                    }
+                let imagePath = '';
+                
+                // Keep old image reference if updating without selecting a new file
+                if (menuId) {
+                    const oldItem = globalMenus.find(m => m.id.toString() === menuId.toString());
+                    if (oldItem) imagePath = oldItem.image;
                 }
 
-                // Prepare parameters payload object
+                // If file is selected, upload file to Storage Bucket "menu"
+                if (fileInput.files && fileInput.files[0]) {
+                    const file = fileInput.files[0];
+                    const fileExt = file.name.split('.').pop();
+                    const uniqueFileName = `${Date.now()}_${Math.random().toString(36).substring(2, 7)}.${fileExt}`;
+
+                    // Execute Supabase Upload via standard SDK
+                    const { data: uploadData, error: uploadError } = await cloudClient.storage
+                        .from('menu')
+                        .upload(uniqueFileName, file, { cacheControl: '3600', upsert: true });
+
+                    if (uploadError) throw uploadError;
+                    
+                    // Store relative unique name
+                    imagePath = uniqueFileName;
+                }
+
+                if (!imagePath && !menuId) {
+                    throw new Error("Sila pilih gambar sajian untuk pendaftaran menu baharu.");
+                }
+
                 const payload = {
                     name,
                     category,
                     price,
                     description,
                     badge,
-                    badge_color: badgeColor
+                    badge_color: badgeColor,
+                    image: imagePath
                 };
 
-                if (imageUrl) {
-                    payload.image = imageUrl;
-                }
-
                 if (menuId) {
-                    // UPDATE Operation
-                    const { error } = await supabaseClient
+                    // Update record
+                    const { error } = await cloudClient
                         .from('list_menu')
                         .update(payload)
                         .eq('id', menuId);
 
                     if (error) throw error;
-                    alertCustom("Sajian berjaya dikemas kini!");
+                    console.log("Menu item updated successfully.");
                 } else {
-                    // INSERT Operation
-                    const { error } = await supabaseClient
+                    // Insert record
+                    const { error } = await cloudClient
                         .from('list_menu')
                         .insert([payload]);
 
                     if (error) throw error;
-                    alertCustom("Sajian baharu berjaya disimpan!");
+                    console.log("New menu item created successfully.");
                 }
 
-                resetMenuForm();
-                fetchSupabaseMenus();
+                // Refresh form & data grid
+                cancelMenuEdit();
+                fetchCloudMenus();
 
             } catch (err) {
-                console.error("Gagal menyimpan menu:", err);
-                alertCustom(`Gagal menyimpan menu: ${err.message}`);
+                console.error("Cloud action failed: ", err);
+                alertCustom(err.message || "Ralat menyimpan hidangan ke pangkalan data.");
             } finally {
-                submitBtn.disabled = false;
-                submitBtn.innerText = originalText;
+                saveBtn.disabled = false;
+                saveBtn.innerHTML = `<i class="fa-solid fa-save"></i> Simpan`;
             }
         }
 
-        // Edit row values parser
-        function editMenuRow(id, name, category, price, desc, image, badge, badgeColor) {
-            document.getElementById('menuId').value = id;
-            document.getElementById('menuName').value = name;
-            document.getElementById('menuCategory').value = category;
-            document.getElementById('menuPrice').value = price;
-            document.getElementById('menuDesc').value = desc;
-            document.getElementById('menuBadge').value = badge;
-            document.getElementById('menuBadgeColor').value = badgeColor;
+        // Fill fields to Edit Menu mode
+        function editMenuForm(id) {
+            const item = globalMenus.find(m => m.id.toString() === id.toString());
+            if (!item) return;
 
-            if (image) {
-                document.getElementById('imagePreview').src = image;
-                document.getElementById('imagePreviewContainer').classList.remove('hidden');
-            } else {
-                clearImagePreview();
-            }
+            document.getElementById('editMenuId').value = item.id;
+            document.getElementById('menuName').value = item.name;
+            document.getElementById('menuCategory').value = item.category || 'makanan';
+            document.getElementById('menuPrice').value = item.price;
+            document.getElementById('menuDescription').value = item.description || '';
+            document.getElementById('menuBadge').value = item.badge || '';
+            document.getElementById('menuBadgeColor').value = item.badge_color || 'bg-red-500 text-white';
 
-            document.getElementById('formMenuTitle').innerText = "Kemas Kini Sajian";
-            document.getElementById('btnSubmitMenu').innerText = "Simpan Perubahan";
-            document.getElementById('btnCancelEdit').classList.remove('hidden');
+            // Visual update
+            document.getElementById('formTitle').innerText = "Kemas Kini Sajian";
+            document.getElementById('selectedFileName').innerText = "Gambar Sedia Ada";
+            
+            const preview = document.getElementById('imagePreview');
+            const placeholder = document.getElementById('previewPlaceholder');
+            preview.src = getCleanImageUrl(item.image);
+            preview.classList.remove('hidden');
+            placeholder.classList.add('hidden');
         }
 
-        // Reset Menu Management Form
-        function resetMenuForm() {
-            document.getElementById('menuId').value = '';
+        // Cancel editing mode and reset form fields
+        function cancelMenuEdit() {
             document.getElementById('menuForm').reset();
-            clearImagePreview();
-            document.getElementById('formMenuTitle').innerText = "Tambah Sajian Baharu";
-            document.getElementById('btnSubmitMenu').innerText = "Hantar & Simpan Menu";
-            document.getElementById('btnCancelEdit').classList.add('hidden');
+            document.getElementById('editMenuId').value = "";
+            document.getElementById('formTitle').innerText = "Tambah Sajian Baharu";
+            document.getElementById('selectedFileName').innerText = "Tiada gambar dipilih";
+            
+            document.getElementById('imagePreview').src = "";
+            document.getElementById('imagePreview').classList.add('hidden');
+            document.getElementById('previewPlaceholder').classList.remove('hidden');
         }
 
-        // Delete Database Row Operation
-        async function deleteMenuRow(id, imageUrl) {
-            if (!supabaseClient) return;
+        // Remove entire menu item from Cloud Table & Storage File
+        async function deleteMenuFromCloud(id, imagePath) {
+            if (!confirm("Adakah anda pasti untuk memadam sajian menu ini daripada pangkalan data awan?")) return;
 
-            const modal = document.createElement('div');
-            modal.className = "fixed inset-0 bg-black/60 z-50 flex items-center justify-center p-4 transition-opacity duration-300";
-            modal.innerHTML = `
-                <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
-                    <div class="absolute top-0 left-0 right-0 h-1.5 bg-rose-600"></div>
-                    <div class="w-16 h-16 bg-rose-50 rounded-full flex items-center justify-center mx-auto mb-4 border-2 border-rose-500/10 text-rose-500">
-                        <i class="fa-solid fa-circle-exclamation text-2xl animate-pulse"></i>
-                    </div>
-                    <h3 class="text-xl font-classic font-bold text-navy mb-2">Padam Menu?</h3>
-                    <p class="text-xs text-gray-500 mb-6 leading-relaxed">Adakah anda pasti mahu memadam hidangan ini secara kekal dari pangkalan data menu?</p>
-                    <div class="flex gap-3">
-                        <button id="cancelDelBtn" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold transition">Kembali</button>
-                        <button id="confirmDelBtn" class="flex-1 py-2.5 bg-rose-600 hover:bg-rose-700 text-white rounded-xl text-xs font-bold transition shadow-md shadow-rose-200">Ya, Padam</button>
-                    </div>
-                </div>
-            `;
-            document.body.appendChild(modal);
+            try {
+                // Delete row
+                const { error: tableError } = await cloudClient
+                    .from('list_menu')
+                    .delete()
+                    .eq('id', id);
 
-            modal.querySelector('#cancelDelBtn').onclick = () => modal.remove();
-            modal.querySelector('#confirmDelBtn').onclick = async () => {
-                modal.remove();
+                if (tableError) throw tableError;
 
-                try {
-                    // Delete from database
-                    const { error: dbError } = await supabaseClient
-                        .from('list_menu')
-                        .delete()
-                        .eq('id', id);
-
-                    if (dbError) throw dbError;
-
-                    // Try to delete image file from bucket if it exists and belongs to storage
-                    if (imageUrl && imageUrl.includes('/storage/v1/object/public/menu/')) {
-                        const fileName = imageUrl.substring(imageUrl.lastIndexOf('/') + 1);
-                        await supabaseClient.storage.from('menu').remove([fileName]);
-                    }
-
-                    alertCustom("Sajian berjaya dipadam!");
-                    fetchSupabaseMenus();
-
-                } catch (err) {
-                    console.error("Gagal memadam menu:", err);
-                    alertCustom(`Gagal memadam menu: ${err.message}`);
+                // Attempt to delete image from storage if present and not a direct http url
+                if (imagePath && !imagePath.startsWith('http')) {
+                    await cloudClient.storage
+                        .from('menu')
+                        .remove([imagePath]);
                 }
-            };
+
+                console.log("Menu deleted successfully.");
+                fetchCloudMenus();
+
+            } catch (err) {
+                console.error("Deletion failed: ", err);
+                alertCustom("Gagal memadam menu daripada pangkalan data awan.");
+            }
         }
 
-        // Custom alert helper
+        // Custom Error presentation boxes
         function alertCustom(message) {
             const alertDiv = document.createElement('div');
             alertDiv.className = "fixed top-5 left-1/2 transform -translate-x-1/2 z-50 max-w-sm w-11/12 bg-red-950/95 border-2 border-[#c5a850]/50 p-4 rounded-2xl text-center text-white shadow-2xl transition-all duration-300";
