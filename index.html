@@ -104,8 +104,11 @@
                 
                 <!-- Navigation Tabs -->
                 <div class="flex bg-[#1a2e40]/90 p-1 rounded-xl border border-gray-700/50">
-                    <button onclick="switchTab('orders')" id="tabOrders" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850] shadow">
-                        <i class="fa-solid fa-receipt mr-1"></i> Pesanan Aktif
+                    <button onclick="switchTab('dapur')" id="tabDapur" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850] shadow">
+                        <i class="fa-solid fa-fire-burner mr-1"></i> Dapur
+                    </button>
+                    <button onclick="switchTab('orders')" id="tabOrders" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white">
+                        <i class="fa-solid fa-cash-register mr-1"></i> Pembayaran
                     </button>
                     <button onclick="switchTab('history')" id="tabHistory" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-gray-300 hover:text-white">
                         <i class="fa-solid fa-history mr-1"></i> Sejarah Jualan
@@ -117,8 +120,8 @@
             </div>
         </header>
 
-        <!-- STATS SECTION: DYNAMICALLY SWITCHES LABELS / HIDES ON MENU TAB -->
-        <section id="statsSection" class="max-w-7xl mx-auto w-full px-4 pt-6">
+        <!-- STATS SECTION: HIDES EVERYWHERE AND ONLY SHOWS ON SEJARAH JUALAN TAB -->
+        <section id="statsSection" class="max-w-7xl mx-auto w-full px-4 pt-6 hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <!-- Sales Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
@@ -163,7 +166,7 @@
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
                     <div class="flex items-center gap-2">
-                        <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Aktif</h3>
+                        <h3 class="text-xl font-serif-elegant font-bold text-navy">Pembayaran</h3>
                         <!-- Live Clock for Cashier and Admin -->
                         <span id="adminLiveClock" class="text-xs bg-slate-200 text-slate-800 font-mono px-3 py-1 rounded-lg border border-slate-300 font-bold">
                             Memuatkan masa...
@@ -238,15 +241,17 @@
             </div>
         </section>
 
-        <!-- TAB CONTENT: URUS MENU (SUPABASE INTEGRATION) -->
+        <!-- TAB CONTENT: URUS MENU (SUPABASE INTEGRATION + LOCAL STORE SETTINGS) -->
         <section id="tabMenuContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
                 
-                <!-- Left panel: Form (Add/Edit Menu) -->
-                <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md flex flex-col justify-between">
-                    <div>
+                <!-- Left panel: Stacked Forms (Menu + Store Settings) -->
+                <div class="space-y-6 lg:col-span-1">
+                    
+                    <!-- Form A: Add/Edit Menu Item -->
+                    <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
-                            <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-edit"></i></span>
+                            <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-bowl-food"></i></span>
                             <h3 id="formTitle" class="text-base font-classic font-bold text-navy">Tambah Sajian Baharu</h3>
                         </div>
 
@@ -276,15 +281,14 @@
                             </div>
 
                             <div>
-                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Penerangan Menu (Copywriting) <span class="text-red-500">*</span></label>
-                                <textarea id="menuDescription" required rows="3" placeholder="Penerangan menarik rasa yang memikat selera..." 
+                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Penerangan Menu <span class="text-red-500">*</span></label>
+                                <textarea id="menuDescription" required rows="2" placeholder="Penerangan menarik rasa yang memikat selera..." 
                                     class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]"></textarea>
                             </div>
 
-                            <!-- Optional Badge Info -->
                             <div class="grid grid-cols-2 gap-3">
                                 <div>
-                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Badge (Pilihan)</label>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Badge</label>
                                     <input type="text" id="menuBadge" placeholder="Contoh: Terlaris" 
                                         class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
                                 </div>
@@ -299,34 +303,77 @@
                                 </div>
                             </div>
 
-                            <!-- Image Upload Container -->
+                            <!-- Image Upload -->
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Gambar Sajian <span class="text-red-500">*</span></label>
                                 <div class="flex items-center gap-3">
                                     <input type="file" id="menuImageFile" accept="image/*" class="hidden" onchange="previewSelectedImage(this)">
                                     <button type="button" onclick="document.getElementById('menuImageFile').click()" 
-                                        class="px-3 py-2 bg-gray-100 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-200 flex items-center gap-1.5">
+                                        class="px-3 py-1.5 bg-gray-100 border border-gray-200 rounded-lg text-xs font-semibold text-gray-700 hover:bg-gray-200 flex items-center gap-1.5">
                                         <i class="fa-solid fa-cloud-arrow-up text-[#c5a850]"></i> Pilih Fail
                                     </button>
-                                    <span id="selectedFileName" class="text-[10px] text-gray-400 truncate max-w-[150px]">Tiada gambar dipilih</span>
+                                    <span id="selectedFileName" class="text-[10px] text-gray-400 truncate max-w-[120px]">Tiada fail</span>
                                 </div>
-                                <div class="mt-3 aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center relative">
+                                <div class="mt-2 aspect-[4/3] w-full rounded-xl overflow-hidden bg-gray-50 border border-dashed border-gray-200 flex items-center justify-center relative">
                                     <img id="imagePreview" src="" alt="Pratonton" class="w-full h-full object-cover hidden">
-                                    <span id="previewPlaceholder" class="text-xs text-gray-400"><i class="fa-solid fa-image text-xl block text-center mb-1 text-gray-300"></i> Pratonton Gambar</span>
+                                    <span id="previewPlaceholder" class="text-xs text-gray-400"><i class="fa-solid fa-image text-lg block text-center mb-1 text-gray-300"></i> Pratonton</span>
                                 </div>
                             </div>
                         </form>
+
+                        <div class="pt-3 border-t border-gray-100 flex gap-2 mt-4">
+                            <button type="button" onclick="cancelMenuEdit()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold uppercase transition">
+                                Batal
+                            </button>
+                            <button type="button" onclick="saveMenuToCloud()" id="btnSaveMenu" class="flex-1 py-2 bg-[#111e29] hover:bg-[#c5a850] text-white hover:text-[#111e29] rounded-xl text-xs font-bold uppercase transition flex items-center justify-center gap-1">
+                                <i class="fa-solid fa-save"></i> Simpan
+                            </button>
+                        </div>
                     </div>
 
-                    <!-- Action buttons -->
-                    <div class="pt-4 border-t border-gray-100 flex gap-2 mt-4">
-                        <button type="button" onclick="cancelMenuEdit()" class="flex-1 py-2.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold uppercase transition">
-                            Batal
-                        </button>
-                        <button type="button" onclick="saveMenuToCloud()" id="btnSaveMenu" class="flex-1 py-2.5 bg-[#111e29] hover:bg-[#c5a850] text-white hover:text-[#111e29] rounded-xl text-xs font-bold uppercase transition flex items-center justify-center gap-1">
-                            <i class="fa-solid fa-save"></i> Simpan
-                        </button>
+                    <!-- Form B: Tetapan Kedai (Kaedah Pembayaran & Cukai) -->
+                    <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
+                            <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-sliders"></i></span>
+                            <h3 class="text-base font-classic font-bold text-navy">Tetapan Kedai & Cukai</h3>
+                        </div>
+
+                        <div class="space-y-4">
+                            <!-- Available payment methods manager -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1.5">Kaedah Pembayaran Aktif</label>
+                                <div id="paymentMethodsList" class="space-y-1 max-h-32 overflow-y-auto mb-2 p-2 bg-gray-50 rounded-lg border border-gray-100">
+                                    <!-- Populated dynamically -->
+                                </div>
+                                <div class="flex gap-1.5">
+                                    <input type="text" id="newPaymentMethodInput" placeholder="Tambah kaedah baru (cth: GrabPay)" 
+                                        class="flex-grow px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
+                                    <button type="button" onclick="addPaymentMethod()" class="px-3 py-1.5 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold rounded-lg transition-colors">
+                                        <i class="fa-solid fa-plus"></i>
+                                    </button>
+                                </div>
+                            </div>
+
+                            <!-- Taxes setup (SST & Service Tax/Charge) -->
+                            <div class="grid grid-cols-2 gap-3">
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Nilai SST (%)</label>
+                                    <input type="number" id="sstRateInput" placeholder="0" min="0" max="100" step="1"
+                                        class="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
+                                </div>
+                                <div>
+                                    <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Cukai Lain/Servis (%)</label>
+                                    <input type="number" id="serviceChargeRateInput" placeholder="0" min="0" max="100" step="1"
+                                        class="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
+                                </div>
+                            </div>
+
+                            <button type="button" onclick="saveStoreSettings()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
+                                <i class="fa-solid fa-floppy-disk"></i> Simpan Tetapan
+                            </button>
+                        </div>
                     </div>
+
                 </div>
 
                 <!-- Right panel: Existing Menu Items Table (Cloud synced) -->
@@ -359,6 +406,52 @@
             </div>
         </section>
 
+        <!-- TAB CONTENT: DAPUR -->
+        <section id="tabDapurContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
+            <div class="mb-6">
+                <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Dapur</h3>
+                <p class="text-xs text-gray-500 mt-1">Menguruskan penyediaan makanan dan minuman oleh tukang masak.</p>
+            </div>
+            
+            <div id="dapurOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+            <!-- Empty State -->
+            <div id="noDapurOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-[#c5a850]/20 shadow-sm">
+                <i class="fa-solid fa-kitchen-set text-5xl text-[#c5a850] mb-4"></i>
+                <h4 class="font-bold text-gray-800">Tiada Pesanan di Dapur</h4>
+                <p class="text-xs text-gray-400 mt-1">Semua pesanan makanan telah siap disediakan atau belum diterima.</p>
+            </div>
+        </section>
+
+    </div>
+
+    <!-- PASSWORD PROMPT MODAL -->
+    <div id="passwordModal" class="fixed inset-0 bg-[#111e29]/90 z-50 flex items-center justify-center px-4 hidden">
+        <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
+            <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
+            
+            <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#c5a850]/25 text-[#c5a850]">
+                <i class="fa-solid fa-lock text-2xl"></i>
+            </div>
+
+            <h3 class="text-lg font-classic font-bold text-navy mb-1">Akses Kawalan Keselamatan</h3>
+            <p class="text-xs text-gray-500 mb-4">Sila masukkan kata laluan pentadbir untuk melihat tab ini.</p>
+
+            <input type="password" id="adminPasswordInput" class="w-full px-3 py-2.5 text-center text-xl tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c5a850] mb-4 font-mono font-bold" placeholder="******">
+            
+            <div id="passwordError" class="hidden text-xs text-red-600 mb-3 font-semibold">
+                <i class="fa-solid fa-circle-exclamation mr-1"></i> Kata laluan salah! Sila cuba semula.
+            </div>
+
+            <div class="flex gap-2">
+                <button onclick="closePasswordModal()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
+                    Batal
+                </button>
+                <button onclick="submitPassword()" class="flex-1 py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold rounded-xl transition">
+                    Masuk
+                </button>
+            </div>
+        </div>
     </div>
 
     <!-- FOOTER -->
@@ -391,8 +484,18 @@
         let cloudClient;
         let globalOrders = [];
         let globalMenus = [];
+        
+        // Dynamic settings with fallbacks
+        let globalSettings = {
+            availablePaymentMethods: ["Cash", "Card Debit/Kredit", "QR Pay"],
+            sstRate: 0,
+            otherTaxRate: 0,
+            otherTaxName: "Service Charge"
+        };
+
         let filterType = 'unpaid'; // Default filter to Unpaid
-        let currentTab = 'orders'; // Default tab to Orders
+        let currentTab = 'dapur'; // Default tab changed to Dapur first
+        let pendingTabTarget = null; // Temp holder for password verification path
 
         window.addEventListener('DOMContentLoaded', async () => {
             startAdminClock();
@@ -416,9 +519,13 @@
                 badge.className = "flex items-center gap-1 text-[9px] bg-emerald-500/10 text-emerald-500 px-2.5 py-0.5 rounded-full border border-emerald-500/20 font-bold";
                 badge.innerHTML = `<span class="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse"></span> ONLINE`;
 
-                // Fire real-time listener for orders and populate menus
+                // Fire real-time listener for orders, shop settings, and populate menus
                 listenToOrders();
+                listenToSettings();
                 fetchCloudMenus();
+
+                // Set initial tab styling
+                switchTab('dapur');
 
             } catch (err) {
                 console.error("Firebase Auth or DB Error:", err);
@@ -457,6 +564,26 @@
         }
 
         // ------------------------------------------------------------
+        // FIRESTORE LIVE SHOP SETTINGS LISTENER
+        // ------------------------------------------------------------
+        function listenToSettings() {
+            if (!db) return;
+            const settingsRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('config');
+            settingsRef.onSnapshot((doc) => {
+                if (doc.exists) {
+                    globalSettings = doc.data();
+                } else {
+                    // Seed the collection document with the initial values
+                    settingsRef.set(globalSettings);
+                }
+                renderSettingsUI();
+                renderDashboard();
+            }, (err) => {
+                console.error("Failed to sync shop settings: ", err);
+            });
+        }
+
+        // ------------------------------------------------------------
         // LIVE DIGITAL CLOCK DISPLAY (MALAY)
         // ------------------------------------------------------------
         function startAdminClock() {
@@ -482,30 +609,69 @@
         }
 
         // ------------------------------------------------------------
-        // TAB SWITCH CONTROLLER - HIDES STATS SECTION ON MENU TAB
+        // TAB SWITCH CONTROLLER WITH SECURITY PASSWORD CHECK (595959)
         // ------------------------------------------------------------
         function switchTab(tab) {
+            // Check for security clearance for history or menu setup
+            if ((tab === 'history' || tab === 'menu') && sessionStorage.getItem('admin_authenticated') !== 'true') {
+                pendingTabTarget = tab;
+                openPasswordModal();
+                return;
+            }
+
             currentTab = tab;
             
             // Buttons visual update
+            document.getElementById('tabDapur').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'dapur' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
             document.getElementById('tabOrders').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'orders' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
             document.getElementById('tabHistory').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'history' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
             document.getElementById('tabMenu').className = "px-4 py-2 text-xs font-bold rounded-lg transition-all " + (tab === 'menu' ? "text-navy bg-[#c5a850] shadow" : "text-gray-300 hover:text-white");
 
             // Panes show/hide
+            document.getElementById('tabDapurContent').classList.toggle('hidden', tab !== 'dapur');
             document.getElementById('tabOrdersContent').classList.toggle('hidden', tab !== 'orders');
             document.getElementById('tabHistoryContent').classList.toggle('hidden', tab !== 'history');
             document.getElementById('tabMenuContent').classList.toggle('hidden', tab !== 'menu');
 
-            // HIDE/SHOW STATS CONTAINER FOR MENU TAB AS REQUESTED
+            // HIDE/SHOW STATS CONTAINER: ONLY show when in the History Tab
             const statsSection = document.getElementById('statsSection');
-            if (tab === 'menu') {
-                statsSection.classList.add('hidden');
-            } else {
+            if (tab === 'history') {
                 statsSection.classList.remove('hidden');
+            } else {
+                statsSection.classList.add('hidden');
             }
 
             renderDashboard();
+        }
+
+        // ------------------------------------------------------------
+        // PASSWORD PROMPT DIALOG ACTIONS
+        // ------------------------------------------------------------
+        function openPasswordModal() {
+            document.getElementById('passwordModal').classList.remove('hidden');
+            document.getElementById('adminPasswordInput').value = '';
+            document.getElementById('passwordError').classList.add('hidden');
+            document.getElementById('adminPasswordInput').focus();
+        }
+
+        function closePasswordModal() {
+            document.getElementById('passwordModal').classList.add('hidden');
+            pendingTabTarget = null;
+        }
+
+        function submitPassword() {
+            const inputVal = document.getElementById('adminPasswordInput').value;
+            if (inputVal === '595959') {
+                sessionStorage.setItem('admin_authenticated', 'true');
+                document.getElementById('passwordModal').classList.add('hidden');
+                if (pendingTabTarget) {
+                    switchTab(pendingTabTarget);
+                }
+            } else {
+                document.getElementById('passwordError').classList.remove('hidden');
+                document.getElementById('adminPasswordInput').value = '';
+                document.getElementById('adminPasswordInput').focus();
+            }
         }
 
         function setFilter(type) {
@@ -535,6 +701,9 @@
             const noOrdersNotice = document.getElementById('noLiveOrders');
             const historyTableBody = document.getElementById('historyTableBody');
             const noHistoryData = document.getElementById('noHistoryData');
+            
+            const dapurOrdersGrid = document.getElementById('dapurOrdersContainer');
+            const noDapurNotice = document.getElementById('noDapurOrders');
 
             const textTodaySales = document.getElementById('todaySales');
             const textTodayCustomers = document.getElementById('todayCustomers');
@@ -550,35 +719,11 @@
             const dateFilterInput = document.getElementById('historyDateFilter');
             const dateFilterVal = dateFilterInput ? dateFilterInput.value : ''; // "YYYY-MM-DD" style
 
-            // 1. STATS METRIC LABELS SELECTION
-            if (currentTab === 'orders') {
-                // Today's metrics only
-                labelSalesCard.innerText = "Kutipan Hari Ini";
-                labelCustomerCard.innerText = "Pelanggan Hari Ini";
-                labelPendingCard.innerText = "Menunggu Bayaran (Hari Ini)";
+            const sstVal = Number(globalSettings.sstRate || 0);
+            const otherTaxVal = Number(globalSettings.otherTaxRate || 0);
 
-                const todayOrders = globalOrders.filter(order => order.createdAt && new Date(order.createdAt).toDateString() === todayStr);
-                
-                let salesSum = 0;
-                let unpaidSum = 0;
-                let customerCount = 0;
-
-                todayOrders.forEach(o => {
-                    const price = Number(o.totalPrice) || 0;
-                    if (o.paymentStatus === 'Paid') {
-                        salesSum += price;
-                        customerCount++;
-                    } else {
-                        unpaidSum += price;
-                    }
-                });
-
-                textTodaySales.innerText = `RM ${salesSum.toFixed(2)}`;
-                textTodayCustomers.innerText = `${customerCount} Orang`;
-                textPendingPayments.innerText = `RM ${unpaidSum.toFixed(2)}`;
-
-            } else if (currentTab === 'history') {
-                // If date is selected, metrics show chosen date stats. Otherwise, Cumulative All-Time Metrics
+            // 1. STATS METRIC CALCULATIONS & LABELS SELECTION
+            if (currentTab === 'history') {
                 if (dateFilterVal) {
                     const formattedDateStr = new Date(dateFilterVal).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
                     labelSalesCard.innerText = `Kutipan (${formattedDateStr})`;
@@ -605,12 +750,16 @@
                         if (oDateString !== dateFilterVal) return; // Skip if no match
                     }
 
-                    const price = Number(o.totalPrice) || 0;
+                    const subtotal = Number(o.totalPrice || 0);
+                    const sstAmount = subtotal * (sstVal / 100);
+                    const otherTaxAmount = subtotal * (otherTaxVal / 100);
+                    const orderTotal = subtotal + sstAmount + otherTaxAmount;
+
                     if (o.paymentStatus === 'Paid') {
-                        salesSum += price;
+                        salesSum += orderTotal;
                         customerCount++;
                     } else {
-                        unpaidSum += price;
+                        unpaidSum += orderTotal;
                     }
                 });
 
@@ -619,12 +768,16 @@
                 textPendingPayments.innerText = `RM ${unpaidSum.toFixed(2)}`;
             }
 
-            // 2. RENDERING ACTIVE ORDERS PANEL
+            // 2. RENDERING ACTIVE ORDERS (PEMBAYARAN) PANEL
+            // Only orders that are "Siap" in kitchen are moved here for checkout
             if (currentTab === 'orders') {
-                // Display strictly orders of today
-                let activeList = globalOrders.filter(order => order.createdAt && new Date(order.createdAt).toDateString() === todayStr);
+                let activeList = globalOrders.filter(order => {
+                    const isToday = order.createdAt && new Date(order.createdAt).toDateString() === todayStr;
+                    const isSiap = order.kitchenStatus === 'Siap';
+                    return isToday && isSiap;
+                });
                 
-                // Filter status criteria
+                // Filter payment status criteria
                 activeList = activeList.filter(order => {
                     const status = order.paymentStatus || 'Unpaid';
                     return filterType === 'paid' ? status === 'Paid' : status === 'Unpaid';
@@ -654,7 +807,6 @@
                                     </span>
                                     <div class="flex items-center gap-2">
                                         <span class="font-semibold text-gray-500">RM ${((it.price || 0) * (it.quantity || 1)).toFixed(2)}</span>
-                                        <!-- Trash button to cancel specifically one item from an order -->
                                         <button onclick="removeItemFromOrder('${order.id}', ${idx})" class="text-red-500 hover:text-red-700 p-0.5" title="Batal Menu Ini">
                                             <i class="fa-regular fa-trash-can text-[11px]"></i>
                                         </button>
@@ -662,6 +814,68 @@
                                 </div>
                             `;
                         });
+
+                        // Calculate dynamic taxes based on settings
+                        const subtotal = Number(order.totalPrice || 0);
+                        const sstAmount = subtotal * (sstVal / 100);
+                        const otherTaxAmount = subtotal * (otherTaxVal / 100);
+                        const grandTotal = subtotal + sstAmount + otherTaxAmount;
+
+                        // Display payment method and notes ifPaid/Unpaid
+                        let paymentConfigHtml = '';
+                        if (isPaid) {
+                            paymentConfigHtml = `
+                                <div class="space-y-1 my-3 pt-2.5 border-t border-dashed border-gray-200 text-xs">
+                                    <p class="text-gray-500"><span class="font-bold">Kaedah:</span> ${order.paymentMethod || 'Cash'}</p>
+                                    <p class="text-gray-500"><span class="font-bold">Nota:</span> <span class="italic text-gray-700">${order.notes || 'Tiada nota'}</span></p>
+                                </div>
+                            `;
+                        } else {
+                            // Populate dropdown dynamically with configured settings
+                            let optionsHtml = '';
+                            const methods = globalSettings.availablePaymentMethods || ["Cash", "Card Debit/Kredit", "QR Pay"];
+                            methods.forEach(m => {
+                                optionsHtml += `<option value="${m}" ${order.paymentMethod === m ? 'selected' : ''}>${m}</option>`;
+                            });
+
+                            paymentConfigHtml = `
+                                <div class="space-y-2.5 my-3 pt-2.5 border-t border-dashed border-gray-200">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kaedah Pembayaran</label>
+                                        <select id="payMethod-${order.id}" class="w-full text-xs p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850] bg-white text-gray-700 font-semibold">
+                                            ${optionsHtml}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Nota Pembayaran</label>
+                                        <input type="text" id="payNotes-${order.id}" placeholder="Peringatan tambahan..." value="${order.notes || ''}" class="w-full text-xs p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850] text-gray-700">
+                                    </div>
+                                </div>
+                            `;
+                        }
+
+                        // Tax calculation breakdowns
+                        let taxBreakdownHtml = '';
+                        if (sstVal > 0 || otherTaxVal > 0) {
+                            taxBreakdownHtml = `
+                                <div class="text-[10px] text-gray-500 space-y-0.5 border-t border-gray-100 pt-2 mb-2">
+                                    <div class="flex justify-between">
+                                        <span>Subtotal:</span>
+                                        <span>RM ${subtotal.toFixed(2)}</span>
+                                    </div>
+                                    ${sstVal > 0 ? `
+                                    <div class="flex justify-between">
+                                        <span>SST (${sstVal}%):</span>
+                                        <span>RM ${sstAmount.toFixed(2)}</span>
+                                    </div>` : ''}
+                                    ${otherTaxVal > 0 ? `
+                                    <div class="flex justify-between">
+                                        <span>Servis (${otherTaxVal}%):</span>
+                                        <span>RM ${otherTaxAmount.toFixed(2)}</span>
+                                    </div>` : ''}
+                                </div>
+                            `;
+                        }
 
                         const orderDate = order.createdAt ? new Date(order.createdAt) : new Date();
                         const timeString = orderDate.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
@@ -683,18 +897,21 @@
                                 <div class="space-y-1 my-3 bg-gray-50 p-3 rounded-xl border border-gray-100">
                                     ${itemsHtml}
                                 </div>
+
+                                ${paymentConfigHtml}
                             </div>
 
                             <div>
+                                ${taxBreakdownHtml}
                                 <div class="flex justify-between items-center py-2 border-t border-gray-100 mb-3">
-                                    <span class="text-xs font-semibold text-gray-500">Jumlah Kasar:</span>
-                                    <span class="text-lg font-serif-elegant font-bold text-navy">RM ${Number(order.totalPrice || 0).toFixed(2)}</span>
+                                    <span class="text-xs font-semibold text-gray-500">Jumlah Bersih:</span>
+                                    <span class="text-lg font-serif-elegant font-bold text-navy">RM ${grandTotal.toFixed(2)}</span>
                                 </div>
                                 <div class="flex gap-2">
-                                    <!-- Toggle status PAID/UNPAID -->
-                                    <button onclick="togglePaymentStatus('${order.id}', '${isPaid ? 'Unpaid' : 'Paid'}')" 
-                                        class="flex-1 py-2 rounded-lg text-xs font-bold uppercase transition ${isPaid ? 'bg-amber-100 hover:bg-amber-200 text-[#111e29]' : 'bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm'}">
-                                        ${isPaid ? 'Tukar UNPAID' : 'PAID'}
+                                    <!-- Toggle status PAID/UNPAID with config validation -->
+                                    <button onclick="togglePaymentStatusWithDetails('${order.id}', '${isPaid ? 'Unpaid' : 'Paid'}')" 
+                                        class="flex-1 py-2 rounded-lg text-xs font-bold uppercase transition bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
+                                        ${isPaid ? 'TUKAR UNPAID' : 'PAID'}
                                     </button>
                                     <button onclick="confirmDeleteOrder('${order.id}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs transition" title="Batal Keseluruhan Pesanan">
                                         <i class="fa-solid fa-trash-can"></i>
@@ -707,9 +924,89 @@
                 }
             }
 
-            // 3. RENDERING HISTORY RECORDS
+            // 3. RENDERING DAPUR ACTIVE ORDERS PANEL
+            // Only orders of today where kitchen status is not "Siap"
+            if (currentTab === 'dapur') {
+                let dapurList = globalOrders.filter(order => {
+                    const isToday = order.createdAt && new Date(order.createdAt).toDateString() === todayStr;
+                    const kitchenStatus = order.kitchenStatus || 'Baru';
+                    return isToday && kitchenStatus !== 'Siap';
+                });
+
+                if (dapurList.length === 0) {
+                    noDapurNotice.classList.remove('hidden');
+                    dapurOrdersGrid.classList.add('hidden');
+                } else {
+                    noDapurNotice.classList.add('hidden');
+                    dapurOrdersGrid.classList.remove('hidden');
+                    dapurOrdersGrid.innerHTML = '';
+
+                    // Sorted chronological (first come first serve)
+                    dapurList.sort((a, b) => new Date(a.createdAt || 0) - new Date(b.createdAt || 0)).forEach(order => {
+                        const card = document.createElement('div');
+                        const kitchenStatus = order.kitchenStatus || 'Baru';
+                        
+                        let statusColor = "bg-red-100 text-red-800";
+                        let statusLabel = "Pesanan Baru";
+                        let actionBtn = "";
+
+                        if (kitchenStatus === 'Baru') {
+                            statusColor = "bg-red-100 text-red-800 animate-pulse";
+                            statusLabel = "Pesanan Baru";
+                            actionBtn = `
+                                <button onclick="updateKitchenStatus('${order.id}', 'Sedang Menyiapkan')" class="w-full py-2.5 bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs uppercase rounded-lg transition shadow-sm">
+                                    <i class="fa-solid fa-cookie-bite mr-1"></i> Sedang Menyiapkan
+                                </button>
+                            `;
+                        } else if (kitchenStatus === 'Sedang Menyiapkan') {
+                            statusColor = "bg-amber-100 text-amber-800";
+                            statusLabel = "Sedang Menyiapkan";
+                            actionBtn = `
+                                <button onclick="updateKitchenStatus('${order.id}', 'Siap')" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-700 text-white font-bold text-xs uppercase rounded-lg transition shadow-sm">
+                                    <i class="fa-solid fa-circle-check mr-1"></i> Siap
+                                </button>
+                            `;
+                        }
+
+                        let itemsHtml = "";
+                        const items = Array.isArray(order.items) ? order.items : [];
+                        items.forEach(it => {
+                            itemsHtml += `
+                                <div class="flex justify-between py-1.5 border-b border-gray-100 text-xs">
+                                    <span class="font-bold text-navy text-sm">${it.quantity}x</span>
+                                    <span class="text-gray-800 font-semibold text-right">${it.name}</span>
+                                </div>
+                            `;
+                        });
+
+                        const orderDateObj = order.createdAt ? new Date(order.createdAt) : new Date();
+                        const createdTime = orderDateObj.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+
+                        card.className = "p-5 rounded-2xl border bg-white border-amber-200 shadow-sm flex flex-col justify-between";
+                        card.innerHTML = `
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <span class="text-xs bg-navy text-white px-2.5 py-1 rounded-lg font-bold">MEJA ${order.tableNumber || '?'}</span>
+                                    <span class="text-[10px] font-bold uppercase px-2.5 py-0.5 rounded-full ${statusColor}">${statusLabel}</span>
+                                </div>
+                                <p class="text-[10px] font-mono text-gray-400 mb-2">ID: ${order.receiptId || order.id}</p>
+                                <p class="text-[11px] text-[#c5a850] font-bold mb-3"><i class="fa-regular fa-clock mr-1"></i> Masuk pada ${createdTime}</p>
+                                <div class="space-y-1 mb-4 bg-amber-50/30 p-3 rounded-xl border border-amber-100/50">
+                                    ${itemsHtml}
+                                </div>
+                            </div>
+                            <div>
+                                ${actionBtn}
+                            </div>
+                        `;
+                        dapurOrdersGrid.appendChild(card);
+                    });
+                }
+            }
+
+            // 4. RENDERING HISTORY RECORDS
             if (currentTab === 'history') {
-                // Filter the history list based on the date selection
+                // Filter history list based on date
                 let historyList = [...globalOrders];
                 if (dateFilterVal) {
                     historyList = historyList.filter(order => {
@@ -748,17 +1045,23 @@
                         const timeString = orderDate.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
                         const isPaid = order.paymentStatus === 'Paid';
 
+                        const subTotal = Number(order.totalPrice || 0);
+                        const finalTotal = subTotal + (subTotal * (sstVal / 100)) + (subTotal * (otherTaxVal / 100));
+
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-slate-50 transition-colors border-b border-gray-100 last:border-0";
                         tr.innerHTML = `
                             <td class="p-4 font-semibold text-gray-800">${dateString} <span class="text-gray-400 font-normal ml-1">${timeString}</span></td>
                             <td class="p-4 font-mono font-bold text-gray-400">${order.receiptId || order.id}</td>
                             <td class="p-4"><span class="bg-gray-100 text-navy px-2.5 py-1 rounded text-xs font-bold">Meja ${order.tableNumber || '?'}</span></td>
-                            <td class="p-4 font-serif-elegant font-bold text-navy text-sm">RM ${Number(order.totalPrice || 0).toFixed(2)}</td>
+                            <td class="p-4 font-serif-elegant font-bold text-navy text-sm">RM ${finalTotal.toFixed(2)}</td>
                             <td class="p-4">
-                                <span class="px-2 py-0.5 rounded text-[10px] font-bold ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
-                                    ${order.paymentStatus || 'Unpaid'}
-                                </span>
+                                <div class="flex flex-col">
+                                    <span class="px-2 py-0.5 rounded text-[10px] font-bold w-max ${isPaid ? 'bg-emerald-100 text-emerald-800' : 'bg-rose-100 text-rose-800'}">
+                                        ${order.paymentStatus || 'Unpaid'}
+                                    </span>
+                                    ${isPaid ? `<span class="text-[9px] text-gray-400 mt-0.5 font-semibold">${order.paymentMethod || 'Cash'}</span>` : ''}
+                                </div>
                             </td>
                             <td class="p-4">
                                 <button onclick="downloadReceiptPDF('${order.id}')" class="px-3 py-1 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-[10px] font-bold rounded-lg uppercase tracking-wider transition">
@@ -773,18 +1076,61 @@
         }
 
         // ------------------------------------------------------------
-        // UPDATE TRANSACTION OR PAYMENT STATUS
+        // UPDATE KITCHEN STATUS (DAPUR ALIRAN KERJA)
         // ------------------------------------------------------------
-        async function togglePaymentStatus(orderDocId, newStatus) {
+        async function updateKitchenStatus(orderDocId, newStatus) {
             if (!db) return;
             try {
                 await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderDocId).update({
-                    paymentStatus: newStatus
+                    kitchenStatus: newStatus
                 });
+                console.log(`Kitchen status updated to: ${newStatus}`);
+            } catch (err) {
+                console.error("Failed to update kitchen status:", err);
+                alertCustom("Gagal mengemaskini status dapur.");
+            }
+        }
+
+        // ------------------------------------------------------------
+        // UPDATE TRANSACTION OR PAYMENT STATUS WITH DETAILS (METHOD & NOTES)
+        // ------------------------------------------------------------
+        async function togglePaymentStatusWithDetails(orderDocId, newStatus) {
+            if (!db) return;
+            try {
+                let updatePayload = {
+                    paymentStatus: newStatus
+                };
+
+                if (newStatus === 'Paid') {
+                    const methodSelect = document.getElementById(`payMethod-${orderDocId}`);
+                    const notesInput = document.getElementById(`payNotes-${orderDocId}`);
+
+                    if (methodSelect) {
+                        updatePayload.paymentMethod = methodSelect.value;
+                    }
+                    if (notesInput) {
+                        updatePayload.notes = notesInput.value.trim();
+                    }
+                    
+                    // Capture exact payment checkout date/time
+                    updatePayload.paidAt = new Date().toISOString();
+                } else {
+                    // Reset if Unpaid
+                    updatePayload.paymentMethod = firebase.firestore.FieldValue.delete();
+                    updatePayload.notes = firebase.firestore.FieldValue.delete();
+                    updatePayload.paidAt = firebase.firestore.FieldValue.delete();
+                }
+
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderDocId).update(updatePayload);
             } catch(e) {
-                console.error("Failed to update payment status:", e);
+                console.error("Failed to update payment status with details:", e);
                 alertCustom("Ralat mengemaskini status bayaran.");
             }
+        }
+
+        // Keep fallback compatible toggle logic
+        async function togglePaymentStatus(orderDocId, newStatus) {
+            await togglePaymentStatusWithDetails(orderDocId, newStatus);
         }
 
         // ------------------------------------------------------------
@@ -835,7 +1181,7 @@
         }
 
         // ------------------------------------------------------------
-        // DOWNLOAD THERMAL-STYLE RECEIPT PDF
+        // DOWNLOAD THERMAL-STYLE RECEIPT PDF WITH TAX BREAKDOWNS & PAYMENT DATE
         // ------------------------------------------------------------
         function downloadReceiptPDF(orderDocId) {
             const order = globalOrders.find(o => o.id === orderDocId);
@@ -845,7 +1191,7 @@
             const doc = new jsPDF({
                 orientation: 'portrait',
                 unit: 'mm',
-                format: [80, 150] // Standard A6/Thermal width layout style
+                format: [80, 160] // Adjusted height layout style to support billing details
             });
 
             // Clean Header Styles
@@ -861,17 +1207,27 @@
             doc.line(10, 25, 70, 25);
 
             // Receipt Metadata details
+            const orderDate = order.createdAt ? new Date(order.createdAt) : new Date();
             doc.setFont('Helvetica', 'bold');
             doc.text(`MEJA: ${order.tableNumber || '?'}`, 10, 30);
             doc.setFont('Helvetica', 'normal');
             doc.text(`ID Resit: ${order.receiptId || order.id}`, 10, 34);
-            doc.text(`Tarikh: ${new Date(order.createdAt).toLocaleDateString('ms-MY')}`, 10, 38);
-            doc.text(`Masa: ${new Date(order.createdAt).toLocaleTimeString('ms-MY')}`, 10, 42);
+            doc.text(`Tarikh Pesanan: ${orderDate.toLocaleDateString('ms-MY')}`, 10, 38);
+            
+            // Format Payment checkout date/time details dynamically on the PDF
+            const isPaid = order.paymentStatus === 'Paid';
+            const paidDateObj = order.paidAt ? new Date(order.paidAt) : orderDate;
+            const paidDateString = paidDateObj.toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
+            const paidTimeString = paidDateObj.toLocaleTimeString('ms-MY', { hour: '2-digit', minute: '2-digit' });
 
-            doc.line(10, 45, 70, 45);
+            doc.text(`Tarikh Bayaran: ${isPaid ? paidDateString + ' ' + paidTimeString : '-'}`, 10, 42);
+            doc.text(`Kaedah Bayaran: ${order.paymentMethod || 'Cash'}`, 10, 46);
+            doc.text(`Nota: ${order.notes || 'Tiada'}`, 10, 50);
+
+            doc.line(10, 53, 70, 53);
 
             // Items breakdown
-            let y = 50;
+            let y = 58;
             doc.setFont('Helvetica', 'bold');
             doc.text("Sajian", 10, y);
             doc.text("Kuantiti", 45, y, { align: 'center' });
@@ -891,13 +1247,42 @@
             doc.line(10, y - 2, 70, y - 2);
             y += 3;
 
-            // Total price representation
-            doc.setFont('Helvetica', 'bold');
+            // TAX CALCULATIONS FOR RECEIPT
+            const subtotal = Number(order.totalPrice || 0);
+            const sstVal = Number(globalSettings.sstRate || 0);
+            const otherTaxVal = Number(globalSettings.otherTaxRate || 0);
+            const sstAmount = subtotal * (sstVal / 100);
+            const otherTaxAmount = subtotal * (otherTaxVal / 100);
+            const grandTotal = subtotal + sstAmount + otherTaxAmount;
+
+            // Print tax summaries if configured
+            doc.setFontSize(7);
             doc.text("Jumlah Kasar:", 10, y);
-            doc.text(`RM ${Number(order.totalPrice).toFixed(2)}`, 70, y, { align: 'right' });
+            doc.text(`RM ${subtotal.toFixed(2)}`, 70, y, { align: 'right' });
+            y += 4;
+
+            if (sstVal > 0) {
+                doc.text(`SST (${sstVal}%):`, 10, y);
+                doc.text(`RM ${sstAmount.toFixed(2)}`, 70, y, { align: 'right' });
+                y += 4;
+            }
+
+            if (otherTaxVal > 0) {
+                doc.text(`Servis (${otherTaxVal}%):`, 10, y);
+                doc.text(`RM ${otherTaxAmount.toFixed(2)}`, 70, y, { align: 'right' });
+                y += 4;
+            }
+
+            doc.line(10, y - 2, 70, y - 2);
+            y += 2;
+
+            // Total grand price representation
+            doc.setFont('Helvetica', 'bold');
+            doc.setFontSize(8);
+            doc.text("Jumlah Bersih:", 10, y);
+            doc.text(`RM ${grandTotal.toFixed(2)}`, 70, y, { align: 'right' });
             
             y += 6;
-            doc.setFont('Helvetica', 'bold');
             doc.text(`STATUS: ${order.paymentStatus || 'Unpaid'}`, 10, y);
 
             y += 8;
@@ -978,7 +1363,7 @@
 
                 const reader = new FileReader();
                 reader.onload = function(e) {
-                    preview.src = e.target.result;
+                    preview.src = e.result;
                     preview.classList.remove('hidden');
                     placeholder.classList.add('hidden');
                 }
@@ -1147,6 +1532,68 @@
             } catch (err) {
                 console.error("Deletion failed: ", err);
                 alertCustom("Gagal memadam menu daripada pangkalan data awan.");
+            }
+        }
+
+        // ------------------------------------------------------------
+        // STORE SETTINGS CONTROLLERS (PAYMENTS & TAXES)
+        // ------------------------------------------------------------
+        function renderSettingsUI() {
+            document.getElementById('sstRateInput').value = globalSettings.sstRate || 0;
+            document.getElementById('serviceChargeRateInput').value = globalSettings.otherTaxRate || 0;
+            
+            const listContainer = document.getElementById('paymentMethodsList');
+            if (listContainer) {
+                listContainer.innerHTML = '';
+                const methods = globalSettings.availablePaymentMethods || ["Cash", "Card Debit/Kredit", "QR Pay"];
+                methods.forEach((m, idx) => {
+                    const item = document.createElement('div');
+                    item.className = "flex justify-between items-center text-xs py-1 border-b border-gray-100 last:border-0";
+                    item.innerHTML = `
+                        <span class="font-semibold text-gray-700">${m}</span>
+                        <button type="button" onclick="deletePaymentMethod(${idx})" class="text-red-500 hover:text-red-700 p-0.5"><i class="fa-regular fa-trash-can text-[10px]"></i></button>
+                    `;
+                    listContainer.appendChild(item);
+                });
+            }
+        }
+
+        function addPaymentMethod() {
+            const input = document.getElementById('newPaymentMethodInput');
+            const newVal = input.value.trim();
+            if (!newVal) return;
+
+            if (!globalSettings.availablePaymentMethods) {
+                globalSettings.availablePaymentMethods = [];
+            }
+            globalSettings.availablePaymentMethods.push(newVal);
+            input.value = '';
+            renderSettingsUI();
+        }
+
+        function deletePaymentMethod(index) {
+            if (globalSettings.availablePaymentMethods && globalSettings.availablePaymentMethods.length <= 1) {
+                alertCustom("Anda mesti mempunyai sekurang-kurangnya satu kaedah pembayaran aktif!");
+                return;
+            }
+            globalSettings.availablePaymentMethods.splice(index, 1);
+            renderSettingsUI();
+        }
+
+        async function saveStoreSettings() {
+            if (!db) return;
+            const sst = parseFloat(document.getElementById('sstRateInput').value) || 0;
+            const sc = parseFloat(document.getElementById('serviceChargeRateInput').value) || 0;
+
+            globalSettings.sstRate = sst;
+            globalSettings.otherTaxRate = sc;
+
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('config').set(globalSettings);
+                alertCustom("Tetapan pembayaran dan kadar cukai berjaya disimpan!");
+            } catch (err) {
+                console.error("Gagal menyimpan tetapan kedai:", err);
+                alertCustom("Ralat menyimpan konfigurasi tetapan ke Cloud.");
             }
         }
 
