@@ -195,6 +195,45 @@
 
         <!-- TAB CONTENT: HISTORY -->
         <section id="tabHistoryContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
+            <!-- TODAY'S REAL-TIME STATS ROW (DEDICATED FOR SEJARAH TAB) -->
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
+                <!-- Today's Sales Card -->
+                <div class="bg-white p-5 rounded-2xl border border-emerald-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block mb-1">Kutipan Hari Ini</span>
+                        <h4 class="text-2xl font-serif-elegant font-bold text-gray-800" id="histTodaySales">RM 0.00</h4>
+                        <p class="text-[10px] text-gray-400 mt-1">Sajian terjual hari ini berstatus <span class="font-bold text-emerald-600">PAID</span></p>
+                    </div>
+                    <div class="w-12 h-12 bg-emerald-50 rounded-2xl flex items-center justify-center text-emerald-600 border border-emerald-100">
+                        <i class="fa-solid fa-coins text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Today's Customers Card -->
+                <div class="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
+                        <h4 class="text-2xl font-serif-elegant font-bold text-gray-800" id="histTodayCustomers">0 Orang</h4>
+                        <p class="text-[10px] text-gray-400 mt-1">Jumlah pelanggan unik yang telah bayar hari ini</p>
+                    </div>
+                    <div class="w-12 h-12 bg-blue-50 rounded-2xl flex items-center justify-center text-blue-600 border border-blue-100">
+                        <i class="fa-solid fa-users text-xl"></i>
+                    </div>
+                </div>
+
+                <!-- Today's Pending Payments Card -->
+                <div class="bg-white p-5 rounded-2xl border border-rose-200 shadow-sm flex items-center justify-between">
+                    <div>
+                        <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 block mb-1">Belum Dikutip Hari Ini</span>
+                        <h4 class="text-2xl font-serif-elegant font-bold text-rose-800" id="histTodayPending">RM 0.00</h4>
+                        <p class="text-[10px] text-gray-400 mt-1">Baki bil hari ini yang belum dijelaskan</p>
+                    </div>
+                    <div class="w-12 h-12 bg-rose-50 rounded-2xl flex items-center justify-center text-rose-600 border border-rose-100">
+                        <i class="fa-solid fa-cash-register text-xl"></i>
+                    </div>
+                </div>
+            </div>
+
             <!-- Header Title and Date Filter Row -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
@@ -713,6 +752,11 @@
             const labelCustomerCard = document.getElementById('labelCustomerCard');
             const labelPendingCard = document.getElementById('labelPendingCard');
 
+            // Elements for dedicated today's stats on History Tab
+            const histTodaySalesEl = document.getElementById('histTodaySales');
+            const histTodayCustomersEl = document.getElementById('histTodayCustomers');
+            const histTodayPendingEl = document.getElementById('histTodayPending');
+
             const todayStr = new Date().toDateString();
 
             // Read chosen date filter if any
@@ -722,7 +766,32 @@
             const sstVal = Number(globalSettings.sstRate || 0);
             const otherTaxVal = Number(globalSettings.otherTaxRate || 0);
 
-            // 1. STATS METRIC CALCULATIONS & LABELS SELECTION
+            // CALCULATE TODAY'S REAL-TIME STATS FOR DEDICATED SUMMARY ROWS
+            const todayOrdersList = globalOrders.filter(order => order.createdAt && new Date(order.createdAt).toDateString() === todayStr);
+            let todayPaidSum = 0;
+            let todayUnpaidSum = 0;
+            let todayPaidCustomersCount = 0;
+
+            todayOrdersList.forEach(o => {
+                const subtotal = Number(o.totalPrice || 0);
+                const sstAmount = subtotal * (sstVal / 100);
+                const otherTaxAmount = subtotal * (otherTaxVal / 100);
+                const orderTotal = subtotal + sstAmount + otherTaxAmount;
+
+                if (o.paymentStatus === 'Paid') {
+                    todayPaidSum += orderTotal;
+                    todayPaidCustomersCount++;
+                } else {
+                    todayUnpaidSum += orderTotal;
+                }
+            });
+
+            // Populate today's real-time stats directly on Sejarah Tab cards
+            if (histTodaySalesEl) histTodaySalesEl.innerText = `RM ${todayPaidSum.toFixed(2)}`;
+            if (histTodayCustomersEl) histTodayCustomersEl.innerText = `${todayPaidCustomersCount} Orang`;
+            if (histTodayPendingEl) histTodayPendingEl.innerText = `RM ${todayUnpaidSum.toFixed(2)}`;
+
+            // 1. STATS METRIC CALCULATIONS & LABELS SELECTION FOR SEJARAH GRAPH
             if (currentTab === 'history') {
                 if (dateFilterVal) {
                     const formattedDateStr = new Date(dateFilterVal).toLocaleDateString('ms-MY', { day: 'numeric', month: 'short', year: 'numeric' });
@@ -912,6 +981,10 @@
                                     <button onclick="togglePaymentStatusWithDetails('${order.id}', '${isPaid ? 'Unpaid' : 'Paid'}')" 
                                         class="flex-1 py-2 rounded-lg text-xs font-bold uppercase transition bg-emerald-600 hover:bg-emerald-700 text-white shadow-sm">
                                         ${isPaid ? 'TUKAR UNPAID' : 'PAID'}
+                                    </button>
+                                    <!-- Direct download/print receipt option built directly on payment card tab -->
+                                    <button onclick="downloadReceiptPDF('${order.id}')" class="px-3 py-2 bg-amber-50 hover:bg-amber-100 text-[#c5a850] border border-[#c5a850]/30 rounded-lg text-xs transition" title="Cetak Resit/Bil">
+                                        <i class="fa-solid fa-print"></i>
                                     </button>
                                     <button onclick="confirmDeleteOrder('${order.id}')" class="px-3 py-2 bg-red-50 hover:bg-red-100 text-red-600 rounded-lg text-xs transition" title="Batal Keseluruhan Pesanan">
                                         <i class="fa-solid fa-trash-can"></i>
