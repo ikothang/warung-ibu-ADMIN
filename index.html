@@ -564,6 +564,9 @@
         let globalOrders = [];
         let globalMenus = [];
         
+        let seenOrderIds = new Set();
+        let isInitialLoad = true;
+        
         // Dynamic settings with fallbacks
         let globalSettings = {
             availablePaymentMethods: ["Cash", "Card Debit/Kredit", "QR Pay"],
@@ -632,16 +635,77 @@
 
             const collectionRef = db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders');
             collectionRef.onSnapshot((querySnapshot) => {
-                globalOrders = [];
+                let hasNewOrder = false;
+                const tempOrders = [];
+
                 querySnapshot.forEach((doc) => {
-                    globalOrders.push({ id: doc.id, ...doc.data() });
+                    const data = doc.data();
+                    const orderId = doc.id;
+                    tempOrders.push({ id: orderId, ...data });
+
+                    // Semak jika ada pesanan baru berstatus 'Baru' yang belum pernah didaftarkan
+                    const isNewStatus = !data.kitchenStatus || data.kitchenStatus === 'Baru';
+                    if (!isInitialLoad && !seenOrderIds.has(orderId) && isNewStatus) {
+                        hasNewOrder = true;
+                    }
+                    seenOrderIds.add(orderId);
                 });
+
+                globalOrders = tempOrders;
+
+                if (isInitialLoad) {
+                    // Selesai pemuatan pertama tanpa membunyikan loceng untuk data sedia ada
+                    isInitialLoad = false;
+                } else if (hasNewOrder) {
+                    playBellSound();
+                }
 
                 // Render metrics and list
                 renderDashboard();
             }, (err) => {
                 console.error("Failed to sync live orders: ", err);
             });
+        }
+
+        function playBellSound() {
+            try {
+                const AudioContext = window.AudioContext || window.webkitAudioContext;
+                if (!AudioContext) return;
+                const ctx = new AudioContext();
+                
+                // Pembinaan dua gelombang bunyi untuk meniru bunyi besi loceng mekanikal
+                const osc1 = ctx.createOscillator();
+                const osc2 = ctx.createOscillator();
+                const gainNode = ctx.createGain();
+                
+                // Nada utama loceng yang tinggi (A5 - 880Hz)
+                osc1.type = 'sine';
+                osc1.frequency.setValueAtTime(880, ctx.currentTime);
+                
+                // Nada harmoni tambahan (Overtone - 1760Hz)
+                osc2.type = 'triangle';
+                osc2.frequency.setValueAtTime(1760, ctx.currentTime);
+                
+                // Kawalan volume (Sustained Decay Envelope)
+                gainNode.gain.setValueAtTime(0, ctx.currentTime);
+                // Serangan pukulan loceng yang pantas (Fast Attack)
+                gainNode.gain.linearRampToValueAtTime(0.4, ctx.currentTime + 0.02);
+                // Gema loceng yang menurun secara perlahan (Exponential Decay)
+                gainNode.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 1.2);
+                
+                osc1.connect(gainNode);
+                osc2.connect(gainNode);
+                gainNode.connect(ctx.destination);
+                
+                osc1.start(ctx.currentTime);
+                osc2.start(ctx.currentTime);
+                
+                // Hentikan osilator setelah gema habis
+                osc1.stop(ctx.currentTime + 1.3);
+                osc2.stop(ctx.currentTime + 1.3);
+            } catch (e) {
+                console.warn("AudioContext disekat atau tidak disokong oleh pelayar web sehingga pengguna berinteraksi dengan halaman:", e);
+            }
         }
 
         // ------------------------------------------------------------
