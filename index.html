@@ -12,48 +12,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-
-<!-- Firebase SDKs (Compatibility versions for globally scoped vanilla objects) -->
+    
+    <!-- Firebase SDKs (Compatibility versions for globally scoped vanilla objects) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-<!-- Cloud Database SDK Client -->
+    <!-- Cloud Database SDK Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- jsPDF for thermal style billing receipts download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-<style>
+    <style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #fcfbf7;
             color: #2c2520;
         }
-
-.font-serif-elegant {
+        
+        .font-serif-elegant {
             font-family: 'Playfair Display', serif;
         }
-
-.font-classic {
+        
+        .font-classic {
             font-family: 'Cinzel', serif;
         }
 
-/* Royal Batik Classic Theme Colors */
+        /* Royal Batik Classic Theme Colors */
         .batik-bg {
             background-color: #111e29;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 0l40 40-40 40L0 40z' fill='%23c5a850' fill-opacity='0.08'/%3E%3Cpath d='M40 10l30 30-30 30-30-30z' fill='%231a2e40' fill-opacity='0.2'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23c5a850' fill-opacity='0.3'/%3E%3C/svg%3E");
         }
 
-.batik-light {
+        .batik-light {
             background-color: #fbf9f3;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23c5a850' fill-opacity='0.04'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23c5a850' fill-opacity='0.15'/%3E%3C/svg%3E");
         }
 
-.bg-navy {
+        .bg-navy {
             background-color: #111e29;
         }
 
-::-webkit-scrollbar {
+        ::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
@@ -68,7 +68,7 @@
 </head>
 <body class="batik-light min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-<!-- OVERLAY LOADING SPINNER -->
+    <!-- OVERLAY LOADING SPINNER -->
     <div id="loadingOverlay" class="fixed inset-0 bg-[#111e29] z-50 flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="relative w-24 h-24 mb-4">
             <div class="absolute inset-0 border-4 border-dashed border-[#c5a850] rounded-full animate-spin"></div>
@@ -80,10 +80,10 @@
         <p class="text-xs text-gray-400 mt-2">Urus Jualan, Pesanan & Menu Warisan</p>
     </div>
 
-<!-- MAIN DASHBOARD WRAPPER -->
+    <!-- MAIN DASHBOARD WRAPPER -->
     <div class="flex-grow flex flex-col">
-
-<!-- Sticky Elegant Header -->
+        
+        <!-- Sticky Elegant Header -->
         <header class="bg-navy text-white shadow-xl sticky top-0 z-30">
             <div class="h-1 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
             <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
@@ -98,11 +98,11 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENYAMBUNG
                             </span>
                         </div>
-                        <p class="text-[10px] text-gray-300">Sistem Bersepadu • Urus Jualan, Jejaki Pesanan & Kemas Kini Menu</p>
+                        <p class="text-[10px] text-gray-300">Sistem Bersepadu &bull; Urus Jualan, Jejaki Pesanan & Kemas Kini Menu</p>
                     </div>
                 </div>
-
-<!-- Navigation Tabs -->
+                
+                <!-- Navigation Tabs -->
                 <div class="flex bg-[#1a2e40]/90 p-1 rounded-xl border border-gray-700/50">
                     <button onclick="switchTab('dapur')" id="tabDapur" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850] shadow">
                         <i class="fa-solid fa-fire-burner mr-1"></i> Dapur
@@ -120,7 +120,7 @@
             </div>
         </header>
 
-<!-- STATS SECTION: HIDES EVERYWHERE AND ONLY SHOWS ON SEJARAH JUALAN TAB -->
+        <!-- STATS SECTION: HIDES EVERYWHERE AND ONLY SHOWS ON SEJARAH JUALAN TAB -->
         <section id="statsSection" class="max-w-7xl mx-auto w-full px-4 pt-6 hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <!-- Sales Metric Card -->
@@ -135,7 +135,7 @@
                     </div>
                 </div>
 
-<!-- Customers Metric Card -->
+                <!-- Customers Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="labelCustomerCard" class="text-[10px] font-bold uppercase tracking-wider text-[#c5a850] block mb-1">Pelanggan Hari Ini</span>
@@ -147,7 +147,7 @@
                     </div>
                 </div>
 
-<!-- Unpaid Metric Card -->
+                <!-- Unpaid Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="labelPendingCard" class="text-[10px] font-bold uppercase tracking-wider text-rose-600 block mb-1">Menunggu Bayaran (Unpaid)</span>
@@ -161,7 +161,7 @@
             </div>
         </section>
 
-<!-- TAB CONTENT: LIVE ORDERS -->
+        <!-- TAB CONTENT: LIVE ORDERS -->
         <section id="tabOrdersContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
@@ -175,17 +175,17 @@
                     <p class="text-xs text-gray-500 mt-1">Menguruskan bil meja pelanggan berstatus Belum Bayar atau Sudah Bayar hari ini.</p>
                 </div>
 
-<!-- Filters -->
+                <!-- Filters -->
                 <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg border border-gray-200">
                     <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-navy shadow-sm">Belum Bayar</button>
                     <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-md text-gray-600 hover:text-navy">Sudah Bayar</button>
                 </div>
             </div>
 
-<!-- Grid orders monitor -->
+            <!-- Grid orders monitor -->
             <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-<!-- Empty State -->
+            <!-- Empty State -->
             <div id="noLiveOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-[#c5a850]/20 shadow-sm">
                 <i class="fa-solid fa-clipboard-check text-5xl text-[#c5a850] mb-4 animate-bounce"></i>
                 <h4 class="font-bold text-gray-800">Tiada Rekod Dijumpai</h4>
@@ -193,7 +193,7 @@
             </div>
         </section>
 
-<!-- TAB CONTENT: HISTORY -->
+        <!-- TAB CONTENT: HISTORY -->
         <section id="tabHistoryContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <!-- TODAY'S REAL-TIME STATS ROW (DEDICATED FOR SEJARAH TAB) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
@@ -209,7 +209,7 @@
                     </div>
                 </div>
 
-<!-- Today's Customers Card -->
+                <!-- Today's Customers Card -->
                 <div class="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
@@ -221,7 +221,7 @@
                     </div>
                 </div>
 
-<!-- Today's Pending Payments Card -->
+                <!-- Today's Pending Payments Card -->
                 <div class="bg-white p-5 rounded-2xl border border-rose-200 shadow-sm flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 block mb-1">Belum Dikutip Hari Ini</span>
@@ -234,7 +234,7 @@
                 </div>
             </div>
 
-<!-- Header Title and Date Filter Row -->
+            <!-- Header Title and Date Filter Row -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                     <h3 class="text-xl font-serif-elegant font-bold text-navy">Sejarah Pendapatan Jualan</h3>
@@ -251,13 +251,13 @@
                 </div>
             </div>
 
-<div class="bg-white rounded-2xl border border-[#c5a850]/20 shadow-md overflow-hidden">
+            <div class="bg-white rounded-2xl border border-[#c5a850]/20 shadow-md overflow-hidden">
                 <div class="p-4 bg-navy text-white flex justify-between items-center">
                     <span class="text-xs font-classic tracking-wider uppercase font-bold">Senarai Bil Keseluruhan</span>
                     <span id="filteredCountLabel" class="text-[10px] text-gray-300">Tersusun mengikut waktu transaksi terbaru</span>
                 </div>
-
-<div class="overflow-x-auto">
+                
+                <div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-amber-50/50 text-[10px] uppercase text-gray-500 border-b border-gray-100">
                             <tr>
@@ -273,38 +273,38 @@
                     </table>
                 </div>
 
-<div id="noHistoryData" class="hidden text-center py-16">
+                <div id="noHistoryData" class="hidden text-center py-16">
                     <i class="fa-solid fa-receipt text-4xl text-gray-300 mb-3"></i>
                     <p class="text-xs text-gray-400 font-bold">Tiada Rekod Sejarah Dijumpai</p>
                 </div>
             </div>
         </section>
 
-<!-- TAB CONTENT: SETTING -->
+        <!-- TAB CONTENT: SETTING -->
         <section id="tabMenuContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-
-<!-- Left panel: Stacked Forms (Menu + Store Settings + Password Setting) -->
+                
+                <!-- Left panel: Stacked Forms (Menu + Store Settings + Password Setting) -->
                 <div class="space-y-6 lg:col-span-1">
-
-<!-- Form A: Add/Edit Menu Item -->
+                    
+                    <!-- Form A: Add/Edit Menu Item -->
                     <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                             <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-bowl-food"></i></span>
                             <h3 id="formTitle" class="text-base font-classic font-bold text-navy">Tambah Sajian Baharu</h3>
                         </div>
 
-<!-- Form Fields -->
+                        <!-- Form Fields -->
                         <form id="menuForm" class="space-y-4">
                             <input type="hidden" id="editMenuId" value="">
-
-<div>
+                            
+                            <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Nama Sajian <span class="text-red-500">*</span></label>
                                 <input type="text" id="menuName" required placeholder="Contoh: Nasi Lemak Sambal Sotong" 
                                     class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
                             </div>
 
-<div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Kategori <span class="text-red-500">*</span></label>
                                     <select id="menuCategory" required class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
@@ -319,13 +319,13 @@
                                 </div>
                             </div>
 
-<div>
+                            <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Penerangan Menu <span class="text-red-500">*</span></label>
                                 <textarea id="menuDescription" required rows="2" placeholder="Penerangan menarik rasa yang memikat selera..." 
                                     class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]"></textarea>
                             </div>
 
-<div class="grid grid-cols-2 gap-3">
+                            <div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Badge</label>
                                     <input type="text" id="menuBadge" placeholder="Contoh: Terlaris" 
@@ -342,7 +342,7 @@
                                 </div>
                             </div>
 
-<!-- Image Upload -->
+                            <!-- Image Upload -->
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Gambar Sajian <span class="text-red-500">*</span></label>
                                 <div class="flex items-center gap-3">
@@ -360,7 +360,7 @@
                             </div>
                         </form>
 
-<div class="pt-3 border-t border-gray-100 flex gap-2 mt-4">
+                        <div class="pt-3 border-t border-gray-100 flex gap-2 mt-4">
                             <button type="button" onclick="cancelMenuEdit()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold uppercase transition">
                                 Batal
                             </button>
@@ -370,14 +370,14 @@
                         </div>
                     </div>
 
-<!-- Form B: Tetapan Kedai (Kaedah Pembayaran & Cukai / Caj Take Away) -->
+                    <!-- Form B: Tetapan Kedai (Kaedah Pembayaran & Cukai / Caj Take Away) -->
                     <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                             <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-sliders"></i></span>
                             <h3 class="text-base font-classic font-bold text-navy">Tetapan Kedai & Cukai</h3>
                         </div>
 
-<div class="space-y-4">
+                        <div class="space-y-4">
                             <!-- Available payment methods manager -->
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1.5">Kaedah Pembayaran Aktif</label>
@@ -393,7 +393,7 @@
                                 </div>
                             </div>
 
-<!-- Taxes setup (SST & Service Tax/Charge & Take Away Charge) -->
+                            <!-- Taxes setup (SST & Service Tax/Charge & Take Away Charge) -->
                             <div class="grid grid-cols-3 gap-2">
                                 <div>
                                     <label class="block text-[9px] font-bold uppercase text-gray-500 mb-1">SST (%)</label>
@@ -412,20 +412,20 @@
                                 </div>
                             </div>
 
-<button type="button" onclick="saveStoreSettings()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="saveStoreSettings()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-floppy-disk"></i> Simpan Tetapan
                             </button>
                         </div>
                     </div>
 
-<!-- Form C: Tetapan Kata Laluan Pentadbir (Ubah Kata Laluan) -->
+                    <!-- Form C: Tetapan Kata Laluan Pentadbir (Ubah Kata Laluan) -->
                     <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                             <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-key"></i></span>
                             <h3 class="text-base font-classic font-bold text-navy">Ubah Kata Laluan Pentadbir</h3>
                         </div>
 
-<div class="space-y-4">
+                        <div class="space-y-4">
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Kata Laluan Semasa</label>
                                 <input type="password" id="currentPasswordInput" placeholder="******" 
@@ -447,15 +447,58 @@
                                     class="w-full px-2.5 py-1.5 text-xs border border-rose-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500 bg-rose-50 font-bold text-rose-800">
                             </div>
 
-<button type="button" onclick="changeAdminPassword()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
+                            <button type="button" onclick="changeAdminPassword()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved"></i> Simpan Kata Laluan
                             </button>
                         </div>
                     </div>
 
-</div>
+                    <!-- Form D: Urus Kupon Diskaun -->
+                    <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
+                        <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
+                            <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-ticket"></i></span>
+                            <h3 class="text-base font-classic font-bold text-navy">Urus Kupon Diskaun</h3>
+                        </div>
 
-<!-- Right panel: Existing Menu Items Table (Cloud synced) -->
+                        <div class="space-y-4">
+                            <!-- List of existing coupons -->
+                            <div>
+                                <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1.5">Senarai Kupon Berdaftar</label>
+                                <div id="couponsList" class="space-y-2 max-h-40 overflow-y-auto mb-3 p-2 bg-gray-50 rounded-lg border border-gray-100">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+
+                            <!-- Add new coupon form elements -->
+                            <div class="p-3 bg-amber-50/40 rounded-xl border border-[#c5a850]/20 space-y-3">
+                                <span class="text-[9px] font-bold text-amber-800 uppercase tracking-wider block"><i class="fa-solid fa-plus-circle mr-1"></i> Tambah Kupon Baru</span>
+                                <div>
+                                    <label class="block text-[9px] font-bold text-gray-500 uppercase mb-1">Kod Kupon</label>
+                                    <input type="text" id="newCouponCode" placeholder="Cth: IBU10, PROMO20" class="w-full px-2.5 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850] uppercase font-mono font-bold text-navy">
+                                </div>
+                                <div class="grid grid-cols-2 gap-2">
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-500 uppercase mb-1">Jenis</label>
+                                        <select id="newCouponType" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850] bg-white text-gray-700">
+                                            <option value="percentage">Peratus (%)</option>
+                                            <option value="fixed">Tetap (RM)</option>
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label class="block text-[9px] font-bold text-gray-500 uppercase mb-1">Nilai</label>
+                                        <input type="number" id="newCouponValue" placeholder="0" min="1" step="0.5" class="w-full px-2 py-1.5 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850]">
+                                    </div>
+                                </div>
+                                <button type="button" onclick="addNewCoupon()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5 uppercase font-classic tracking-wider">
+                                    <i class="fa-solid fa-plus text-[10px]"></i> Tambah Kupon
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div>
+
+                <!-- Right panel: Existing Menu Items Table (Cloud synced) -->
                 <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md lg:col-span-2 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
@@ -463,7 +506,7 @@
                             <span id="cloudMenuCount" class="text-xs bg-amber-50 text-[#c5a850] border border-[#c5a850]/20 px-2.5 py-0.5 rounded-full font-bold">0 Sajian</span>
                         </div>
 
-<!-- Menu list table view -->
+                        <!-- Menu list table view -->
                         <div class="overflow-x-auto max-h-[500px]">
                             <table class="w-full text-left">
                                 <thead class="bg-amber-50/50 text-[9px] uppercase text-gray-500 border-b border-gray-100 sticky top-0">
@@ -482,19 +525,19 @@
                     </div>
                 </div>
 
-</div>
+            </div>
         </section>
 
-<!-- TAB CONTENT: DAPUR -->
+        <!-- TAB CONTENT: DAPUR -->
         <section id="tabDapurContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
             <div class="mb-6">
                 <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Dapur</h3>
                 <p class="text-xs text-gray-500 mt-1">Menguruskan penyediaan makanan dan minuman oleh tukang masak.</p>
             </div>
+            
+            <div id="dapurOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-<div id="dapurOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
-
-<!-- Empty State -->
+            <!-- Empty State -->
             <div id="noDapurOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-[#c5a850]/20 shadow-sm">
                 <i class="fa-solid fa-kitchen-set text-5xl text-[#c5a850] mb-4"></i>
                 <h4 class="font-bold text-gray-800">Tiada Pesanan di Dapur</h4>
@@ -502,27 +545,27 @@
             </div>
         </section>
 
-</div>
+    </div>
 
-<!-- PASSWORD PROMPT MODAL -->
+    <!-- PASSWORD PROMPT MODAL -->
     <div id="passwordModal" class="fixed inset-0 bg-[#111e29]/90 z-50 flex items-center justify-center px-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
-
-<div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#c5a850]/25 text-[#c5a850]">
+            
+            <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#c5a850]/25 text-[#c5a850]">
                 <i class="fa-solid fa-lock text-2xl"></i>
             </div>
 
-<h3 class="text-lg font-classic font-bold text-navy mb-1">Akses Kawalan Keselamatan</h3>
+            <h3 class="text-lg font-classic font-bold text-navy mb-1">Akses Kawalan Keselamatan</h3>
             <p class="text-xs text-gray-500 mb-4">Sila masukkan kata laluan pentadbir untuk melihat tab ini.</p>
 
-<input type="password" id="adminPasswordInput" class="w-full px-3 py-2.5 text-center text-xl tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c5a850] mb-4 font-mono font-bold" placeholder="******">
-
-<div id="passwordError" class="hidden text-xs text-red-600 mb-3 font-semibold">
+            <input type="password" id="adminPasswordInput" class="w-full px-3 py-2.5 text-center text-xl tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c5a850] mb-4 font-mono font-bold" placeholder="******">
+            
+            <div id="passwordError" class="hidden text-xs text-red-600 mb-3 font-semibold">
                 <i class="fa-solid fa-circle-exclamation mr-1"></i> Kata laluan salah! Sila cuba semula.
             </div>
 
-<div class="flex gap-2">
+            <div class="flex gap-2">
                 <button onclick="closePasswordModal()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                     Batal
                 </button>
@@ -533,16 +576,16 @@
         </div>
     </div>
 
-<!-- FOOTER -->
+    <!-- FOOTER -->
     <footer class="bg-navy text-gray-400 text-center py-4 border-t border-[#c5a850]/20 text-[11px] tracking-wide relative">
         <div class="absolute inset-0 opacity-5 batik-bg pointer-events-none"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <p>© 2026 Warung Ibu Admin. Sistem Pentadbiran Jualan Bersepadu.</p>
+            <p>&copy; 2026 Warung Ibu Admin. Sistem Pentadbiran Jualan Bersepadu.</p>
             <p class="text-xs text-gray-400">Penyambungan Pintar Melalui Awan</p>
         </div>
     </footer>
 
-<script>
+    <script>
         // Database credentials
         const firebaseConfig = {
             apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
@@ -574,7 +617,8 @@
             otherTaxRate: 0,
             otherTaxName: "Service Charge",
             takeAwayCharge: 0.00, // Default take away charge
-            adminPassword: "595959" // Default password
+            adminPassword: "595959", // Default password
+            coupons: [] // Added coupons configuration
         };
 
         let filterType = 'unpaid'; // Default filter to Unpaid
@@ -717,6 +761,7 @@
             settingsRef.onSnapshot((doc) => {
                 if (doc.exists) {
                     globalSettings = doc.data();
+                    if (!globalSettings.coupons) globalSettings.coupons = [];
                 } else {
                     // Seed the collection document with the initial values
                     settingsRef.set(globalSettings);
@@ -873,6 +918,7 @@
             const sstVal = Number(globalSettings.sstRate || 0);
             const otherTaxVal = Number(globalSettings.otherTaxRate || 0);
             const takeAwayChargeVal = Number(globalSettings.takeAwayCharge || 0);
+            const couponsList = globalSettings.coupons || [];
 
             // CALCULATE TODAY'S REAL-TIME STATS FOR DEDICATED SUMMARY ROWS
             const todayOrdersList = globalOrders.filter(order => order.createdAt && new Date(order.createdAt).toDateString() === todayStr);
@@ -882,11 +928,25 @@
 
             todayOrdersList.forEach(o => {
                 const subtotal = Number(o.totalPrice || 0);
+                
+                // Calculate coupon discount
+                let couponDiscountAmount = 0;
+                if (o.couponCode) {
+                    const foundCoupon = couponsList.find(c => c.code === o.couponCode.toUpperCase() && c.isActive);
+                    if (foundCoupon) {
+                        if (foundCoupon.type === 'percentage') {
+                            couponDiscountAmount = subtotal * (foundCoupon.value / 100);
+                        } else if (foundCoupon.type === 'fixed') {
+                            couponDiscountAmount = Math.min(foundCoupon.value, subtotal);
+                        }
+                    }
+                }
+
                 const sstAmount = subtotal * (sstVal / 100);
                 const otherTaxAmount = subtotal * (otherTaxVal / 100);
                 const isTakeAway = o.serviceMethod === 'Take Away' || o.tableNumber === 'Bungkus' || o.tableNumber === 'Take away';
                 const appliedTakeAwayCharge = isTakeAway ? takeAwayChargeVal : 0;
-                const orderTotal = subtotal + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
+                const orderTotal = subtotal - couponDiscountAmount + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
 
                 if (o.paymentStatus === 'Paid') {
                     todayPaidSum += orderTotal;
@@ -930,11 +990,25 @@
                     }
 
                     const subtotal = Number(o.totalPrice || 0);
+
+                    // Calculate coupon discount
+                    let couponDiscountAmount = 0;
+                    if (o.couponCode) {
+                        const foundCoupon = couponsList.find(c => c.code === o.couponCode.toUpperCase() && c.isActive);
+                        if (foundCoupon) {
+                            if (foundCoupon.type === 'percentage') {
+                                couponDiscountAmount = subtotal * (foundCoupon.value / 100);
+                            } else if (foundCoupon.type === 'fixed') {
+                                couponDiscountAmount = Math.min(foundCoupon.value, subtotal);
+                            }
+                        }
+                    }
+
                     const sstAmount = subtotal * (sstVal / 100);
                     const otherTaxAmount = subtotal * (otherTaxVal / 100);
                     const isTakeAway = o.serviceMethod === 'Take Away' || o.tableNumber === 'Bungkus' || o.tableNumber === 'Take away';
                     const appliedTakeAwayCharge = isTakeAway ? takeAwayChargeVal : 0;
-                    const orderTotal = subtotal + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
+                    const orderTotal = subtotal - couponDiscountAmount + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
 
                     if (o.paymentStatus === 'Paid') {
                         salesSum += orderTotal;
@@ -998,12 +1072,25 @@
                             `;
                         });
 
-                        // Calculate dynamic taxes and take away charges based on settings
+                        // Calculate coupon discount for specific order
                         const subtotal = Number(order.totalPrice || 0);
+                        let couponDiscountAmount = 0;
+                        if (order.couponCode) {
+                            const foundCoupon = couponsList.find(c => c.code === order.couponCode.toUpperCase() && c.isActive);
+                            if (foundCoupon) {
+                                if (foundCoupon.type === 'percentage') {
+                                    couponDiscountAmount = subtotal * (foundCoupon.value / 100);
+                                } else if (foundCoupon.type === 'fixed') {
+                                    couponDiscountAmount = Math.min(foundCoupon.value, subtotal);
+                                }
+                            }
+                        }
+
+                        // Calculate dynamic taxes and take away charges based on settings
                         const sstAmount = subtotal * (sstVal / 100);
                         const otherTaxAmount = subtotal * (otherTaxVal / 100);
                         const appliedTakeAwayCharge = isTakeAway ? takeAwayChargeVal : 0;
-                        const grandTotal = subtotal + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
+                        const grandTotal = subtotal - couponDiscountAmount + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
 
                         // Display payment method and notes ifPaid/Unpaid
                         let paymentConfigHtml = '';
@@ -1012,6 +1099,7 @@
                                 <div class="space-y-1 my-3 pt-2.5 border-t border-dashed border-gray-200 text-xs">
                                     <p class="text-gray-500"><span class="font-bold">Kaedah:</span> ${order.paymentMethod || 'Cash'}</p>
                                     <p class="text-gray-500"><span class="font-bold">Nota:</span> <span class="italic text-gray-700">${order.notes || 'Tiada nota'}</span></p>
+                                    ${order.couponCode ? `<p class="text-emerald-700 font-bold"><span class="font-bold">Kupon:</span> ${order.couponCode} (-RM ${couponDiscountAmount.toFixed(2)})</p>` : ''}
                                 </div>
                             `;
                         } else {
@@ -1024,6 +1112,21 @@
 
                             paymentConfigHtml = `
                                 <div class="space-y-2.5 my-3 pt-2.5 border-t border-dashed border-gray-200">
+                                    <div class="grid grid-cols-1 gap-2 bg-amber-50/40 p-2.5 rounded-xl border border-amber-100/50">
+                                        <label class="block text-[9px] font-bold text-[#c5a850] uppercase tracking-widest">Kupon Diskaun</label>
+                                        <div class="flex gap-1.5">
+                                            <input type="text" id="couponInput-${order.id}" placeholder="Kod Kupon" value="${order.couponCode || ''}" class="flex-grow text-xs p-1.5 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850] uppercase font-mono font-bold text-navy bg-white">
+                                            <button onclick="applyCouponToOrder('${order.id}')" class="px-3 py-1.5 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold rounded-lg transition-colors flex items-center justify-center">
+                                                Guna
+                                            </button>
+                                        </div>
+                                        ${order.couponCode ? `
+                                            <div class="flex justify-between items-center text-[10px] text-emerald-700 font-bold mt-0.5">
+                                                <span><i class="fa-solid fa-circle-check mr-0.5"></i> "${order.couponCode}" digunakan!</span>
+                                                <button onclick="removeCouponFromOrder('${order.id}')" class="text-red-500 hover:text-red-700 font-bold underline">Batal</button>
+                                            </div>
+                                        ` : ''}
+                                    </div>
                                     <div>
                                         <label class="block text-[9px] font-bold text-gray-400 uppercase tracking-widest mb-1">Kaedah Pembayaran</label>
                                         <select id="payMethod-${order.id}" class="w-full text-xs p-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-1 focus:ring-[#c5a850] bg-white text-gray-700 font-semibold">
@@ -1038,15 +1141,20 @@
                             `;
                         }
 
-                        // Tax & Take Away calculation breakdowns inside active cards (Pembayaran Tab)
+                        // Tax & Take Away & Coupon calculation breakdowns inside active cards (Pembayaran Tab)
                         let taxBreakdownHtml = '';
-                        if (sstVal > 0 || otherTaxVal > 0 || appliedTakeAwayCharge > 0) {
+                        if (sstVal > 0 || otherTaxVal > 0 || appliedTakeAwayCharge > 0 || couponDiscountAmount > 0) {
                             taxBreakdownHtml = `
                                 <div class="text-[10px] text-gray-500 space-y-0.5 border-t border-gray-100 pt-2 mb-2">
                                     <div class="flex justify-between">
                                         <span>Subtotal:</span>
                                         <span>RM ${subtotal.toFixed(2)}</span>
                                     </div>
+                                    ${couponDiscountAmount > 0 ? `
+                                    <div class="flex justify-between text-red-600 font-semibold">
+                                        <span>Diskaun (${order.couponCode}):</span>
+                                        <span>-RM ${couponDiscountAmount.toFixed(2)}</span>
+                                    </div>` : ''}
                                     ${sstVal > 0 ? `
                                     <div class="flex justify-between">
                                         <span>SST (${sstVal}%):</span>
@@ -1242,7 +1350,21 @@
                         const subTotal = Number(order.totalPrice || 0);
                         const isTakeAway = order.serviceMethod === 'Take Away' || order.tableNumber === 'Bungkus' || order.tableNumber === 'Take away';
                         const appliedTakeAwayCharge = isTakeAway ? takeAwayChargeVal : 0;
-                        const finalTotal = subTotal + (subTotal * (sstVal / 100)) + (subTotal * (otherTaxVal / 100)) + appliedTakeAwayCharge;
+
+                        // Calculate discount for history records
+                        let couponDiscountAmount = 0;
+                        if (order.couponCode) {
+                            const foundCoupon = couponsList.find(c => c.code === order.couponCode.toUpperCase() && c.isActive);
+                            if (foundCoupon) {
+                                if (foundCoupon.type === 'percentage') {
+                                    couponDiscountAmount = subTotal * (foundCoupon.value / 100);
+                                } else if (foundCoupon.type === 'fixed') {
+                                    couponDiscountAmount = Math.min(foundCoupon.value, subTotal);
+                                }
+                            }
+                        }
+
+                        const finalTotal = subTotal - couponDiscountAmount + (subTotal * (sstVal / 100)) + (subTotal * (otherTaxVal / 100)) + appliedTakeAwayCharge;
 
                         const tr = document.createElement('tr');
                         tr.className = "hover:bg-slate-50 transition-colors border-b border-gray-100 last:border-0";
@@ -1446,22 +1568,42 @@
             doc.line(10, y - 2, 70, y - 2);
             y += 3;
 
-            // TAX & CHARGES CALCULATIONS FOR RECEIPT
+            // TAX & CHARGES & DISCOUNTS CALCULATIONS FOR RECEIPT
             const subtotal = Number(order.totalPrice || 0);
             const sstVal = Number(globalSettings.sstRate || 0);
             const otherTaxVal = Number(globalSettings.otherTaxRate || 0);
             const takeAwayChargeVal = Number(globalSettings.takeAwayCharge || 0);
+            const couponsList = globalSettings.coupons || [];
+
+            // Calculate coupon discount
+            let couponDiscountAmount = 0;
+            if (order.couponCode) {
+                const foundCoupon = couponsList.find(c => c.code === order.couponCode.toUpperCase() && c.isActive);
+                if (foundCoupon) {
+                    if (foundCoupon.type === 'percentage') {
+                        couponDiscountAmount = subtotal * (foundCoupon.value / 100);
+                    } else if (foundCoupon.type === 'fixed') {
+                        couponDiscountAmount = Math.min(foundCoupon.value, subtotal);
+                    }
+                }
+            }
 
             const sstAmount = subtotal * (sstVal / 100);
             const otherTaxAmount = subtotal * (otherTaxVal / 100);
             const appliedTakeAwayCharge = isTakeAway ? takeAwayChargeVal : 0;
-            const grandTotal = subtotal + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
+            const grandTotal = subtotal - couponDiscountAmount + sstAmount + otherTaxAmount + appliedTakeAwayCharge;
 
             // Print tax summaries if configured
             doc.setFontSize(7);
             doc.text("Jumlah Kasar:", 10, y);
             doc.text(`RM ${subtotal.toFixed(2)}`, 70, y, { align: 'right' });
             y += 4;
+
+            if (couponDiscountAmount > 0) {
+                doc.text(`Diskaun (${order.couponCode}):`, 10, y);
+                doc.text(`-RM ${couponDiscountAmount.toFixed(2)}`, 70, y, { align: 'right' });
+                y += 4;
+            }
 
             if (sstVal > 0) {
                 doc.text(`SST (${sstVal}%):`, 10, y);
@@ -1745,6 +1887,127 @@
         }
 
         // ------------------------------------------------------------
+        // DYNAMIC DISCOUNT COUPONS CONTROLLERS
+        // ------------------------------------------------------------
+        async function addNewCoupon() {
+            const codeInput = document.getElementById('newCouponCode');
+            const typeSelect = document.getElementById('newCouponType');
+            const valInput = document.getElementById('newCouponValue');
+
+            const code = codeInput.value.trim().toUpperCase();
+            const type = typeSelect.value;
+            const value = parseFloat(valInput.value);
+
+            if (!code) {
+                alertCustom("Sila isi kod kupon yang sah!");
+                return;
+            }
+
+            if (isNaN(value) || value <= 0) {
+                alertCustom("Sila letakkan nilai kupon yang sah dan lebih daripada 0!");
+                return;
+            }
+
+            if (type === 'percentage' && value > 100) {
+                alertCustom("Nilai diskaun peratusan tidak boleh melebihi 100%!");
+                return;
+            }
+
+            if (!globalSettings.coupons) {
+                globalSettings.coupons = [];
+            }
+
+            // Check duplicate coupon
+            const exists = globalSettings.coupons.some(c => c.code === code);
+            if (exists) {
+                alertCustom(`Kupon dengan kod "${code}" sudah sedia ada!`);
+                return;
+            }
+
+            globalSettings.coupons.push({
+                code: code,
+                type: type,
+                value: value,
+                isActive: true
+            });
+
+            await saveCouponsToCloud();
+            
+            codeInput.value = '';
+            valInput.value = '';
+            renderSettingsUI();
+            renderDashboard();
+        }
+
+        async function toggleCouponActive(index) {
+            if (!globalSettings.coupons || !globalSettings.coupons[index]) return;
+            globalSettings.coupons[index].isActive = !globalSettings.coupons[index].isActive;
+            await saveCouponsToCloud();
+            renderSettingsUI();
+            renderDashboard();
+        }
+
+        async function deleteCoupon(index) {
+            if (!confirm("Adakah anda pasti untuk memadam kupon diskaun ini?")) return;
+            globalSettings.coupons.splice(index, 1);
+            await saveCouponsToCloud();
+            renderSettingsUI();
+            renderDashboard();
+        }
+
+        async function saveCouponsToCloud() {
+            if (!db) return;
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('settings').doc('config').set(globalSettings);
+            } catch (err) {
+                console.error("Gagal menyimpan kupon diskaun ke awan:", err);
+                alertCustom("Ralat menyegerakkan data kupon ke sistem awan.");
+            }
+        }
+
+        async function applyCouponToOrder(orderId) {
+            const input = document.getElementById(`couponInput-${orderId}`);
+            if (!input) return;
+            const code = input.value.trim().toUpperCase();
+
+            if (!code) {
+                alertCustom("Sila masukkan kod kupon sebelum menekan Guna.");
+                return;
+            }
+
+            const coupon = (globalSettings.coupons || []).find(c => c.code === code);
+            if (!coupon) {
+                alertCustom(`Kod kupon "${code}" tidak ditemui.`);
+                return;
+            }
+
+            if (!coupon.isActive) {
+                alertCustom(`Kupon "${code}" telah dinyahaktifkan oleh pentadbir.`);
+                return;
+            }
+
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).update({
+                    couponCode: code
+                });
+            } catch (e) {
+                console.error(e);
+                alertCustom("Gagal memproses kupon pada pesanan.");
+            }
+        }
+
+        async function removeCouponFromOrder(orderId) {
+            try {
+                await db.collection('artifacts').doc(appId).collection('public').doc('data').collection('orders').doc(orderId).update({
+                    couponCode: firebase.firestore.FieldValue.delete()
+                });
+            } catch (e) {
+                console.error(e);
+                alertCustom("Gagal membatalkan kupon daripada pesanan.");
+            }
+        }
+
+        // ------------------------------------------------------------
         // STORE SETTINGS CONTROLLERS (PAYMENTS & TAXES)
         // ------------------------------------------------------------
         function renderSettingsUI() {
@@ -1765,6 +2028,34 @@
                     `;
                     listContainer.appendChild(item);
                 });
+            }
+
+            const couponsContainer = document.getElementById('couponsList');
+            if (couponsContainer) {
+                couponsContainer.innerHTML = '';
+                const coupons = globalSettings.coupons || [];
+                if (coupons.length === 0) {
+                    couponsContainer.innerHTML = `<p class="text-[10px] text-gray-400 italic text-center py-4">Tiada kupon diskaun didaftarkan.</p>`;
+                } else {
+                    coupons.forEach((coupon, idx) => {
+                        const item = document.createElement('div');
+                        item.className = "flex justify-between items-center text-xs p-2 bg-white rounded-lg border border-gray-100 shadow-sm";
+                        const displayVal = coupon.type === 'percentage' ? `${coupon.value}%` : `RM${Number(coupon.value).toFixed(2)}`;
+                        item.innerHTML = `
+                            <div class="flex flex-col">
+                                <span class="font-mono font-bold text-navy tracking-wider text-xs">${coupon.code}</span>
+                                <span class="text-[9px] text-gray-500 font-semibold mt-0.5">Diskaun: ${displayVal}</span>
+                            </div>
+                            <div class="flex items-center gap-2">
+                                <button onclick="toggleCouponActive(${idx})" class="px-2 py-1 text-[9px] font-bold rounded-md transition ${coupon.isActive ? 'bg-emerald-100 text-emerald-800' : 'bg-gray-100 text-gray-400'}" title="Klik untuk ubah status">
+                                    ${coupon.isActive ? 'AKTIF' : 'NYAH-AKTIF'}
+                                </button>
+                                <button type="button" onclick="deleteCoupon(${idx})" class="text-red-500 hover:text-red-700 p-1"><i class="fa-regular fa-trash-can text-[11px]"></i></button>
+                            </div>
+                        `;
+                        couponsContainer.appendChild(item);
+                    });
+                }
             }
         }
 
