@@ -12,48 +12,48 @@
     <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@500;700;800&family=Plus+Jakarta+Sans:wght@300;400;500;600;700&family=Playfair+Display:ital,wght@0,500;0,700;1,400&display=swap" rel="stylesheet">
     <!-- Font Awesome Icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-    
-    <!-- Firebase SDKs (Compatibility versions for globally scoped vanilla objects) -->
+
+<!-- Firebase SDKs (Compatibility versions for globally scoped vanilla objects) -->
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-app-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-auth-compat.js"></script>
     <script src="https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore-compat.js"></script>
 
-    <!-- Cloud Database SDK Client -->
+<!-- Cloud Database SDK Client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <!-- jsPDF for thermal style billing receipts download -->
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
 
-    <style>
+<style>
         body {
             font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #fcfbf7;
             color: #2c2520;
         }
-        
-        .font-serif-elegant {
+
+.font-serif-elegant {
             font-family: 'Playfair Display', serif;
         }
-        
-        .font-classic {
+
+.font-classic {
             font-family: 'Cinzel', serif;
         }
 
-        /* Royal Batik Classic Theme Colors */
+/* Royal Batik Classic Theme Colors */
         .batik-bg {
             background-color: #111e29;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='80' height='80' viewBox='0 0 80 80'%3E%3Cpath d='M40 0l40 40-40 40L0 40z' fill='%23c5a850' fill-opacity='0.08'/%3E%3Cpath d='M40 10l30 30-30 30-30-30z' fill='%231a2e40' fill-opacity='0.2'/%3E%3Ccircle cx='40' cy='40' r='5' fill='%23c5a850' fill-opacity='0.3'/%3E%3C/svg%3E");
         }
 
-        .batik-light {
+.batik-light {
             background-color: #fbf9f3;
             background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='60' height='60' viewBox='0 0 60 60'%3E%3Cpath d='M30 0l30 30-30 30L0 30z' fill='%23c5a850' fill-opacity='0.04'/%3E%3Ccircle cx='30' cy='30' r='3' fill='%23c5a850' fill-opacity='0.15'/%3E%3C/svg%3E");
         }
 
-        .bg-navy {
+.bg-navy {
             background-color: #111e29;
         }
 
-        ::-webkit-scrollbar {
+::-webkit-scrollbar {
             width: 6px;
             height: 6px;
         }
@@ -68,7 +68,7 @@
 </head>
 <body class="batik-light min-h-screen flex flex-col justify-between overflow-x-hidden">
 
-    <!-- OVERLAY LOADING SPINNER -->
+<!-- OVERLAY LOADING SPINNER -->
     <div id="loadingOverlay" class="fixed inset-0 bg-[#111e29] z-50 flex flex-col items-center justify-center transition-opacity duration-300">
         <div class="relative w-24 h-24 mb-4">
             <div class="absolute inset-0 border-4 border-dashed border-[#c5a850] rounded-full animate-spin"></div>
@@ -80,10 +80,10 @@
         <p class="text-xs text-gray-400 mt-2">Urus Jualan, Pesanan & Menu Warisan</p>
     </div>
 
-    <!-- MAIN DASHBOARD WRAPPER -->
+<!-- MAIN DASHBOARD WRAPPER -->
     <div class="flex-grow flex flex-col">
-        
-        <!-- Sticky Elegant Header -->
+
+<!-- Sticky Elegant Header -->
         <header class="bg-navy text-white shadow-xl sticky top-0 z-30">
             <div class="h-1 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
             <div class="max-w-7xl mx-auto px-4 py-3.5 flex flex-col md:flex-row justify-between items-center gap-3">
@@ -98,11 +98,11 @@
                                 <span class="w-1.5 h-1.5 rounded-full bg-amber-500 animate-pulse"></span> MENYAMBUNG
                             </span>
                         </div>
-                        <p class="text-[10px] text-gray-300">Sistem Bersepadu &bull; Urus Jualan, Jejaki Pesanan & Kemas Kini Menu</p>
+                        <p class="text-[10px] text-gray-300">Sistem Bersepadu • Urus Jualan, Jejaki Pesanan & Kemas Kini Menu</p>
                     </div>
                 </div>
-                
-                <!-- Navigation Tabs -->
+
+<!-- Navigation Tabs -->
                 <div class="flex bg-[#1a2e40]/90 p-1 rounded-xl border border-gray-700/50">
                     <button onclick="switchTab('dapur')" id="tabDapur" class="px-4 py-2 text-xs font-bold rounded-lg transition-all text-navy bg-[#c5a850] shadow">
                         <i class="fa-solid fa-fire-burner mr-1"></i> Dapur
@@ -120,7 +120,7 @@
             </div>
         </header>
 
-        <!-- STATS SECTION: HIDES EVERYWHERE AND ONLY SHOWS ON SEJARAH JUALAN TAB -->
+<!-- STATS SECTION: HIDES EVERYWHERE AND ONLY SHOWS ON SEJARAH JUALAN TAB -->
         <section id="statsSection" class="max-w-7xl mx-auto w-full px-4 pt-6 hidden">
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5">
                 <!-- Sales Metric Card -->
@@ -135,7 +135,7 @@
                     </div>
                 </div>
 
-                <!-- Customers Metric Card -->
+<!-- Customers Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="labelCustomerCard" class="text-[10px] font-bold uppercase tracking-wider text-[#c5a850] block mb-1">Pelanggan Hari Ini</span>
@@ -147,7 +147,7 @@
                     </div>
                 </div>
 
-                <!-- Unpaid Metric Card -->
+<!-- Unpaid Metric Card -->
                 <div class="bg-white p-5 rounded-2xl border border-[#c5a850]/20 shadow-sm flex items-center justify-between">
                     <div>
                         <span id="labelPendingCard" class="text-[10px] font-bold uppercase tracking-wider text-rose-600 block mb-1">Menunggu Bayaran (Unpaid)</span>
@@ -161,7 +161,7 @@
             </div>
         </section>
 
-        <!-- TAB CONTENT: LIVE ORDERS -->
+<!-- TAB CONTENT: LIVE ORDERS -->
         <section id="tabOrdersContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <div class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-6">
                 <div>
@@ -175,17 +175,17 @@
                     <p class="text-xs text-gray-500 mt-1">Menguruskan bil meja pelanggan berstatus Belum Bayar atau Sudah Bayar hari ini.</p>
                 </div>
 
-                <!-- Filters -->
+<!-- Filters -->
                 <div class="flex items-center gap-1.5 bg-gray-100 p-1 rounded-lg border border-gray-200">
                     <button onclick="setFilter('unpaid')" id="filterUnpaid" class="px-4 py-1.5 text-xs font-bold rounded-md bg-white text-navy shadow-sm">Belum Bayar</button>
                     <button onclick="setFilter('paid')" id="filterPaid" class="px-4 py-1.5 text-xs font-bold rounded-md text-gray-600 hover:text-navy">Sudah Bayar</button>
                 </div>
             </div>
 
-            <!-- Grid orders monitor -->
+<!-- Grid orders monitor -->
             <div id="liveOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-            <!-- Empty State -->
+<!-- Empty State -->
             <div id="noLiveOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-[#c5a850]/20 shadow-sm">
                 <i class="fa-solid fa-clipboard-check text-5xl text-[#c5a850] mb-4 animate-bounce"></i>
                 <h4 class="font-bold text-gray-800">Tiada Rekod Dijumpai</h4>
@@ -193,7 +193,7 @@
             </div>
         </section>
 
-        <!-- TAB CONTENT: HISTORY -->
+<!-- TAB CONTENT: HISTORY -->
         <section id="tabHistoryContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <!-- TODAY'S REAL-TIME STATS ROW (DEDICATED FOR SEJARAH TAB) -->
             <div class="grid grid-cols-1 md:grid-cols-3 gap-5 mb-6">
@@ -209,7 +209,7 @@
                     </div>
                 </div>
 
-                <!-- Today's Customers Card -->
+<!-- Today's Customers Card -->
                 <div class="bg-white p-5 rounded-2xl border border-blue-200 shadow-sm flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-blue-600 block mb-1">Pelanggan Hari Ini</span>
@@ -221,7 +221,7 @@
                     </div>
                 </div>
 
-                <!-- Today's Pending Payments Card -->
+<!-- Today's Pending Payments Card -->
                 <div class="bg-white p-5 rounded-2xl border border-rose-200 shadow-sm flex items-center justify-between">
                     <div>
                         <span class="text-[10px] font-bold uppercase tracking-wider text-rose-600 block mb-1">Belum Dikutip Hari Ini</span>
@@ -234,7 +234,7 @@
                 </div>
             </div>
 
-            <!-- Header Title and Date Filter Row -->
+<!-- Header Title and Date Filter Row -->
             <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4 mb-6">
                 <div>
                     <h3 class="text-xl font-serif-elegant font-bold text-navy">Sejarah Pendapatan Jualan</h3>
@@ -251,13 +251,13 @@
                 </div>
             </div>
 
-            <div class="bg-white rounded-2xl border border-[#c5a850]/20 shadow-md overflow-hidden">
+<div class="bg-white rounded-2xl border border-[#c5a850]/20 shadow-md overflow-hidden">
                 <div class="p-4 bg-navy text-white flex justify-between items-center">
                     <span class="text-xs font-classic tracking-wider uppercase font-bold">Senarai Bil Keseluruhan</span>
                     <span id="filteredCountLabel" class="text-[10px] text-gray-300">Tersusun mengikut waktu transaksi terbaru</span>
                 </div>
-                
-                <div class="overflow-x-auto">
+
+<div class="overflow-x-auto">
                     <table class="w-full text-left">
                         <thead class="bg-amber-50/50 text-[10px] uppercase text-gray-500 border-b border-gray-100">
                             <tr>
@@ -273,38 +273,38 @@
                     </table>
                 </div>
 
-                <div id="noHistoryData" class="hidden text-center py-16">
+<div id="noHistoryData" class="hidden text-center py-16">
                     <i class="fa-solid fa-receipt text-4xl text-gray-300 mb-3"></i>
                     <p class="text-xs text-gray-400 font-bold">Tiada Rekod Sejarah Dijumpai</p>
                 </div>
             </div>
         </section>
 
-        <!-- TAB CONTENT: SETTING -->
+<!-- TAB CONTENT: SETTING -->
         <section id="tabMenuContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow hidden">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                
-                <!-- Left panel: Stacked Forms (Menu + Store Settings + Password Setting) -->
+
+<!-- Left panel: Stacked Forms (Menu + Store Settings + Password Setting) -->
                 <div class="space-y-6 lg:col-span-1">
-                    
-                    <!-- Form A: Add/Edit Menu Item -->
+
+<!-- Form A: Add/Edit Menu Item -->
                     <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                             <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-bowl-food"></i></span>
                             <h3 id="formTitle" class="text-base font-classic font-bold text-navy">Tambah Sajian Baharu</h3>
                         </div>
 
-                        <!-- Form Fields -->
+<!-- Form Fields -->
                         <form id="menuForm" class="space-y-4">
                             <input type="hidden" id="editMenuId" value="">
-                            
-                            <div>
+
+<div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Nama Sajian <span class="text-red-500">*</span></label>
                                 <input type="text" id="menuName" required placeholder="Contoh: Nasi Lemak Sambal Sotong" 
                                     class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Kategori <span class="text-red-500">*</span></label>
                                     <select id="menuCategory" required class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]">
@@ -319,13 +319,13 @@
                                 </div>
                             </div>
 
-                            <div>
+<div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Penerangan Menu <span class="text-red-500">*</span></label>
                                 <textarea id="menuDescription" required rows="2" placeholder="Penerangan menarik rasa yang memikat selera..." 
                                     class="w-full px-3 py-2 text-xs border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-[#c5a850]"></textarea>
                             </div>
 
-                            <div class="grid grid-cols-2 gap-3">
+<div class="grid grid-cols-2 gap-3">
                                 <div>
                                     <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Badge</label>
                                     <input type="text" id="menuBadge" placeholder="Contoh: Terlaris" 
@@ -342,7 +342,7 @@
                                 </div>
                             </div>
 
-                            <!-- Image Upload -->
+<!-- Image Upload -->
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Gambar Sajian <span class="text-red-500">*</span></label>
                                 <div class="flex items-center gap-3">
@@ -360,7 +360,7 @@
                             </div>
                         </form>
 
-                        <div class="pt-3 border-t border-gray-100 flex gap-2 mt-4">
+<div class="pt-3 border-t border-gray-100 flex gap-2 mt-4">
                             <button type="button" onclick="cancelMenuEdit()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-xl text-xs font-bold uppercase transition">
                                 Batal
                             </button>
@@ -370,14 +370,14 @@
                         </div>
                     </div>
 
-                    <!-- Form B: Tetapan Kedai (Kaedah Pembayaran & Cukai / Caj Take Away) -->
+<!-- Form B: Tetapan Kedai (Kaedah Pembayaran & Cukai / Caj Take Away) -->
                     <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                             <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-sliders"></i></span>
                             <h3 class="text-base font-classic font-bold text-navy">Tetapan Kedai & Cukai</h3>
                         </div>
 
-                        <div class="space-y-4">
+<div class="space-y-4">
                             <!-- Available payment methods manager -->
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1.5">Kaedah Pembayaran Aktif</label>
@@ -393,7 +393,7 @@
                                 </div>
                             </div>
 
-                            <!-- Taxes setup (SST & Service Tax/Charge & Take Away Charge) -->
+<!-- Taxes setup (SST & Service Tax/Charge & Take Away Charge) -->
                             <div class="grid grid-cols-3 gap-2">
                                 <div>
                                     <label class="block text-[9px] font-bold uppercase text-gray-500 mb-1">SST (%)</label>
@@ -412,20 +412,20 @@
                                 </div>
                             </div>
 
-                            <button type="button" onclick="saveStoreSettings()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
+<button type="button" onclick="saveStoreSettings()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-floppy-disk"></i> Simpan Tetapan
                             </button>
                         </div>
                     </div>
 
-                    <!-- Form C: Tetapan Kata Laluan Pentadbir (Ubah Kata Laluan) -->
+<!-- Form C: Tetapan Kata Laluan Pentadbir (Ubah Kata Laluan) -->
                     <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md">
                         <div class="flex items-center gap-2 mb-4 pb-2 border-b border-gray-100">
                             <span class="p-1.5 bg-[#c5a850]/20 text-[#c5a850] rounded-lg"><i class="fa-solid fa-key"></i></span>
                             <h3 class="text-base font-classic font-bold text-navy">Ubah Kata Laluan Pentadbir</h3>
                         </div>
 
-                        <div class="space-y-4">
+<div class="space-y-4">
                             <div>
                                 <label class="block text-[10px] font-bold uppercase text-gray-500 mb-1">Kata Laluan Semasa</label>
                                 <input type="password" id="currentPasswordInput" placeholder="******" 
@@ -447,15 +447,15 @@
                                     class="w-full px-2.5 py-1.5 text-xs border border-rose-300 rounded-lg focus:outline-none focus:ring-1 focus:ring-rose-500 bg-rose-50 font-bold text-rose-800">
                             </div>
 
-                            <button type="button" onclick="changeAdminPassword()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
+<button type="button" onclick="changeAdminPassword()" class="w-full py-2 bg-navy hover:bg-[#c5a850] text-white hover:text-navy text-xs font-bold uppercase tracking-wider rounded-xl transition flex items-center justify-center gap-1.5">
                                 <i class="fa-solid fa-shield-halved"></i> Simpan Kata Laluan
                             </button>
                         </div>
                     </div>
 
-                </div>
+</div>
 
-                <!-- Right panel: Existing Menu Items Table (Cloud synced) -->
+<!-- Right panel: Existing Menu Items Table (Cloud synced) -->
                 <div class="bg-white p-6 rounded-2xl border border-[#c5a850]/20 shadow-md lg:col-span-2 flex flex-col justify-between">
                     <div>
                         <div class="flex items-center justify-between mb-4 pb-2 border-b border-gray-100">
@@ -463,7 +463,7 @@
                             <span id="cloudMenuCount" class="text-xs bg-amber-50 text-[#c5a850] border border-[#c5a850]/20 px-2.5 py-0.5 rounded-full font-bold">0 Sajian</span>
                         </div>
 
-                        <!-- Menu list table view -->
+<!-- Menu list table view -->
                         <div class="overflow-x-auto max-h-[500px]">
                             <table class="w-full text-left">
                                 <thead class="bg-amber-50/50 text-[9px] uppercase text-gray-500 border-b border-gray-100 sticky top-0">
@@ -482,19 +482,19 @@
                     </div>
                 </div>
 
-            </div>
+</div>
         </section>
 
-        <!-- TAB CONTENT: DAPUR -->
+<!-- TAB CONTENT: DAPUR -->
         <section id="tabDapurContent" class="max-w-7xl mx-auto w-full px-4 py-6 flex-grow">
             <div class="mb-6">
                 <h3 class="text-xl font-serif-elegant font-bold text-navy">Pesanan Dapur</h3>
                 <p class="text-xs text-gray-500 mt-1">Menguruskan penyediaan makanan dan minuman oleh tukang masak.</p>
             </div>
-            
-            <div id="dapurOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
 
-            <!-- Empty State -->
+<div id="dapurOrdersContainer" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"></div>
+
+<!-- Empty State -->
             <div id="noDapurOrders" class="hidden text-center py-20 bg-white rounded-3xl border border-[#c5a850]/20 shadow-sm">
                 <i class="fa-solid fa-kitchen-set text-5xl text-[#c5a850] mb-4"></i>
                 <h4 class="font-bold text-gray-800">Tiada Pesanan di Dapur</h4>
@@ -502,27 +502,27 @@
             </div>
         </section>
 
-    </div>
+</div>
 
-    <!-- PASSWORD PROMPT MODAL -->
+<!-- PASSWORD PROMPT MODAL -->
     <div id="passwordModal" class="fixed inset-0 bg-[#111e29]/90 z-50 flex items-center justify-center px-4 hidden">
         <div class="bg-white rounded-3xl p-6 max-w-sm w-full border border-[#c5a850]/40 text-center shadow-2xl relative overflow-hidden">
             <div class="absolute top-0 left-0 right-0 h-1.5 bg-gradient-to-r from-[#c5a850] via-[#ffd700] to-[#c5a850]"></div>
-            
-            <div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#c5a850]/25 text-[#c5a850]">
+
+<div class="w-16 h-16 bg-amber-50 rounded-full flex items-center justify-center mx-auto mb-4 border border-[#c5a850]/25 text-[#c5a850]">
                 <i class="fa-solid fa-lock text-2xl"></i>
             </div>
 
-            <h3 class="text-lg font-classic font-bold text-navy mb-1">Akses Kawalan Keselamatan</h3>
+<h3 class="text-lg font-classic font-bold text-navy mb-1">Akses Kawalan Keselamatan</h3>
             <p class="text-xs text-gray-500 mb-4">Sila masukkan kata laluan pentadbir untuk melihat tab ini.</p>
 
-            <input type="password" id="adminPasswordInput" class="w-full px-3 py-2.5 text-center text-xl tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c5a850] mb-4 font-mono font-bold" placeholder="******">
-            
-            <div id="passwordError" class="hidden text-xs text-red-600 mb-3 font-semibold">
+<input type="password" id="adminPasswordInput" class="w-full px-3 py-2.5 text-center text-xl tracking-widest border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-[#c5a850] mb-4 font-mono font-bold" placeholder="******">
+
+<div id="passwordError" class="hidden text-xs text-red-600 mb-3 font-semibold">
                 <i class="fa-solid fa-circle-exclamation mr-1"></i> Kata laluan salah! Sila cuba semula.
             </div>
 
-            <div class="flex gap-2">
+<div class="flex gap-2">
                 <button onclick="closePasswordModal()" class="flex-1 py-2 bg-gray-100 hover:bg-gray-200 text-gray-700 text-xs font-bold rounded-xl transition">
                     Batal
                 </button>
@@ -533,16 +533,16 @@
         </div>
     </div>
 
-    <!-- FOOTER -->
+<!-- FOOTER -->
     <footer class="bg-navy text-gray-400 text-center py-4 border-t border-[#c5a850]/20 text-[11px] tracking-wide relative">
         <div class="absolute inset-0 opacity-5 batik-bg pointer-events-none"></div>
         <div class="relative z-10 max-w-7xl mx-auto px-4 flex flex-col sm:flex-row justify-between items-center gap-2">
-            <p>&copy; 2026 Warung Ibu Admin. Sistem Pentadbiran Jualan Bersepadu.</p>
+            <p>© 2026 Warung Ibu Admin. Sistem Pentadbiran Jualan Bersepadu.</p>
             <p class="text-xs text-gray-400">Penyambungan Pintar Melalui Awan</p>
         </div>
     </footer>
 
-    <script>
+<script>
         // Database credentials
         const firebaseConfig = {
             apiKey: "AIzaSyDyrX1WmJ67x3w5PDAW6v2yJazT49ZQa7g",
